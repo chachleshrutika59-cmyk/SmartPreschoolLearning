@@ -1,0 +1,15 @@
+venv/
+.venv/
+
+__pycache__/
+*.py[cod]
+
+.env
+.env.*
+
+instance/
+
+.vscode/
+.idea/
+
+*.log
