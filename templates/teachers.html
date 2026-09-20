@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Teachers - Smart Preschool Learning</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+
+    <!-- ==================================================
+         SIDEBAR
+    =================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div style="font-size: 38px;">
+                🧸
+            </div>
+
+            <h2>
+                Smart <span>Preschool</span>
+            </h2>
+
+            <small>
+                Learning Analytics
+            </small>
+
+        </div>
+
+
+        <ul class="sidebar-menu">
+
+            <li>
+                <a href="/admin/dashboard">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/teachers" class="active">
+                    👩‍🏫 Teachers
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/students">
+                    👧 Students
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    👨‍👩‍👧 Parents
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    🏫 Classes
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📅 Academic Years
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📚 Learning Activities
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📊 Analytics
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    💡 Recommendations
+                </a>
+            </li>
+
+        </ul>
+
+
+        <!-- LOGOUT -->
+
+        <div class="sidebar-logout">
+
+            <a href="/logout">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ==================================================
+         MAIN CONTENT
+    =================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- ==================================================
+             TOP BAR
+        =================================================== -->
+
+        <div class="topbar">
+
+            <div>
+
+                <h1>
+                    👩‍🏫 Teachers
+                </h1>
+
+                <p>
+                    Manage teachers and their accounts
+                </p>
+
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div class="profile-avatar">
+                    👑
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ session["user_name"] }}
+                    </strong>
+
+                    <small>
+                        Administrator
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             TEACHER CONTENT
+        =================================================== -->
+
+        <div class="content-card">
+
+
+            <!-- PAGE HEADER -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <h2>
+                        👩‍🏫 Teacher Accounts
+                    </h2>
+
+                    <p>
+                        Create and manage teacher accounts.
+                    </p>
+
+                </div>
+
+
+                <a href="/admin/teachers/add"
+                   class="dashboard-add-button">
+
+                    ➕ Add Teacher
+
+                </a>
+
+            </div>
+
+
+
+            <!-- ==================================================
+                 TEACHER TABLE
+            =================================================== -->
+
+            {% if teachers %}
+
+            <div class="table-wrapper">
+
+                <table class="data-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Teacher Name
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Mobile
+                            </th>
+
+                            <th>
+                                Qualification
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                    {% for teacher in teachers %}
+
+                        <tr>
+
+
+                            <!-- ==========================
+                                 ID
+                            =========================== -->
+
+                            <td>
+                                {{ teacher[0] }}
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 TEACHER NAME
+                            =========================== -->
+
+                            <td>
+
+                                <strong>
+                                    {{ teacher[1] }}
+                                </strong>
+
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 EMAIL
+                            =========================== -->
+
+                            <td>
+                                {{ teacher[3] }}
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 MOBILE
+                            =========================== -->
+
+                            <td>
+                                {{ teacher[2] or "-" }}
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 QUALIFICATION
+                            =========================== -->
+
+                            <td>
+                                {{ teacher[4] or "-" }}
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 STATUS
+                            =========================== -->
+
+                            <td>
+
+                                {% if teacher[5] %}
+
+                                    <span class="status-active">
+                                        ● Active
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-inactive">
+                                        ● Inactive
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 ACTIVATE / DEACTIVATE
+                            =========================== -->
+
+                            <td>
+
+                                <form
+                                    action="{{ url_for(
+                                        'teacher.toggle_teacher',
+                                        teacher_id=teacher[0]
+                                    ) }}"
+                                    method="POST"
+                                    style="display: inline;"
+                                >
+
+                                    {% if teacher[5] %}
+
+                                        <button
+                                            type="submit"
+                                            class="status-button deactivate"
+                                        >
+                                            Deactivate
+                                        </button>
+
+                                    {% else %}
+
+                                        <button
+                                            type="submit"
+                                            class="status-button activate"
+                                        >
+                                            Activate
+                                        </button>
+
+                                    {% endif %}
+
+                                </form>
+
+                            </td>
+
+
+                        </tr>
+
+                    {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ==================================================
+                 NO TEACHERS
+            =================================================== -->
+
+            {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    👩‍🏫
+                </div>
+
+                <h3>
+                    No Teachers Yet
+                </h3>
+
+                <p>
+                    You haven't added any teachers yet.
+                    Start by creating the first teacher account.
+                </p>
+
+                <a href="/admin/teachers/add"
+                   class="dashboard-add-button">
+
+                    ➕ Add First Teacher
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+             FOOTER
+        =================================================== -->
+
+        <div class="dashboard-footer">
+
+            <span>
+                🧸 Smart Preschool Learning
+            </span>
+
+            <span>
+                Learn • Play • Grow 🌈
+            </span>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

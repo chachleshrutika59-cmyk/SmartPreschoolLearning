@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Teacher Dashboard - Smart Preschool Learning</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- ======================================
+         SIDEBAR
+    ======================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div style="font-size: 38px;">
+                🧸
+            </div>
+
+            <h2>
+                Smart <span>Preschool</span>
+            </h2>
+
+            <small>
+                Learning Analytics
+            </small>
+
+        </div>
+
+
+        <ul class="sidebar-menu">
+
+            <li>
+                <a href="/teacher/dashboard" class="active">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    👧 My Students
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📚 Learning Activities
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📝 Assessments
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📅 Attendance
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    💬 Teacher Remarks
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📊 Student Progress
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    💡 Recommendations
+                </a>
+            </li>
+
+        </ul>
+
+
+        <div class="sidebar-logout">
+
+            <a href="/logout">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ======================================
+         MAIN CONTENT
+    ======================================= -->
+
+    <main class="main-content">
+
+
+        <!-- TOP BAR -->
+
+        <div class="topbar">
+
+            <div>
+
+                <h1>
+                    👋 Welcome, {{ session["user_name"] }}!
+                </h1>
+
+                <p>
+                    Manage your students and track their learning progress.
+                </p>
+
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div class="profile-avatar">
+                    👩‍🏫
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ session["user_name"] }}
+                    </strong>
+
+                    <small>
+                        Teacher
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ======================================
+             STATISTICS
+        ======================================= -->
+
+        <div class="dashboard-grid">
+
+
+            <div class="stat-card blue">
+
+                <div class="stat-icon">
+                    👧
+                </div>
+
+                <h3>
+                    My Students
+                </h3>
+
+                <div class="number">
+                    0
+                </div>
+
+                <p>
+                    Assigned students
+                </p>
+
+            </div>
+
+
+            <div class="stat-card pink">
+
+                <div class="stat-icon">
+                    📚
+                </div>
+
+                <h3>
+                    Activities
+                </h3>
+
+                <div class="number">
+                    0
+                </div>
+
+                <p>
+                    Learning records
+                </p>
+
+            </div>
+
+
+            <div class="stat-card yellow">
+
+                <div class="stat-icon">
+                    📅
+                </div>
+
+                <h3>
+                    Attendance
+                </h3>
+
+                <div class="number">
+                    0
+                </div>
+
+                <p>
+                    Records this month
+                </p>
+
+            </div>
+
+
+            <div class="stat-card green">
+
+                <div class="stat-icon">
+                    📊
+                </div>
+
+                <h3>
+                    Assessments
+                </h3>
+
+                <div class="number">
+                    0
+                </div>
+
+                <p>
+                    Assessment records
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ======================================
+             QUICK ACTIONS
+        ======================================= -->
+
+        <div class="content-card">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        🚀 Quick Actions
+                    </h2>
+
+                    <p>
+                        Manage your classroom activities
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="quick-actions">
+
+
+                <a href="#"
+                   class="action-card action-blue">
+
+                    <div class="action-icon">
+                        👧
+                    </div>
+
+                    <h3>
+                        My Students
+                    </h3>
+
+                    <p>
+                        View assigned students
+                    </p>
+
+                </a>
+
+
+                <a href="#"
+                   class="action-card action-pink">
+
+                    <div class="action-icon">
+                        📚
+                    </div>
+
+                    <h3>
+                        Add Activity
+                    </h3>
+
+                    <p>
+                        Record student learning
+                    </p>
+
+                </a>
+
+
+                <a href="#"
+                   class="action-card action-yellow">
+
+                    <div class="action-icon">
+                        📅
+                    </div>
+
+                    <h3>
+                        Attendance
+                    </h3>
+
+                    <p>
+                        Record student attendance
+                    </p>
+
+                </a>
+
+
+                <a href="#"
+                   class="action-card action-green">
+
+                    <div class="action-icon">
+                        📊
+                    </div>
+
+                    <h3>
+                        View Progress
+                    </h3>
+
+                    <p>
+                        Analyze student progress
+                    </p>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- ======================================
+             INFORMATION
+        ======================================= -->
+
+        <div class="content-card">
+
+            <h2>
+                🌟 Teacher Workspace
+            </h2>
+
+            <div class="system-message">
+
+                <div class="message-icon">
+                    🎓
+                </div>
+
+                <div>
+
+                    <h3>
+                        Your classroom is ready!
+                    </h3>
+
+                    <p>
+                        Student records, learning activities,
+                        attendance, assessments and progress
+                        analytics will appear here as you use
+                        the system.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="dashboard-footer">
+
+            <span>
+                🧸 Smart Preschool Learning
+            </span>
+
+            <span>
+                Learn • Play • Grow 🌈
+            </span>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

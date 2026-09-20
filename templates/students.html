@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Students - Smart Preschool Learning</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+
+    <!-- ==================================================
+         SIDEBAR
+    =================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div style="font-size: 38px;">
+                🧸
+            </div>
+
+            <h2>
+                Smart <span>Preschool</span>
+            </h2>
+
+            <small>
+                Learning Analytics
+            </small>
+
+        </div>
+
+
+        <ul class="sidebar-menu">
+
+            <li>
+                <a href="/admin/dashboard">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/teachers">
+                    👩‍🏫 Teachers
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/students" class="active">
+                    👧 Students
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    👨‍👩‍👧 Parents
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    🏫 Classes
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📅 Academic Years
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📚 Learning Activities
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📊 Analytics
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    💡 Recommendations
+                </a>
+            </li>
+
+        </ul>
+
+
+        <!-- LOGOUT -->
+
+        <div class="sidebar-logout">
+
+            <a href="/logout">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ==================================================
+         MAIN CONTENT
+    =================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- ==================================================
+             TOP BAR
+        =================================================== -->
+
+        <div class="topbar">
+
+            <div>
+
+                <h1>
+                    👧 Students
+                </h1>
+
+                <p>
+                    Manage student accounts and enrollment
+                </p>
+
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div class="profile-avatar">
+                    👑
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ session["user_name"] }}
+                    </strong>
+
+                    <small>
+                        Administrator
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             PAGE HEADER
+        =================================================== -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h2>
+                    👧 Student Accounts
+                </h2>
+
+                <p>
+                    View and manage registered students.
+                </p>
+
+            </div>
+
+
+            <a href="/admin/students/add"
+               class="dashboard-add-button">
+
+                ➕ Add Student
+
+            </a>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             STUDENT TABLE
+        =================================================== -->
+
+        <div class="content-card">
+
+
+            {% if students %}
+
+
+            <div class="table-wrapper">
+
+                <table class="data-table">
+
+
+                    <!-- TABLE HEADER -->
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Student Name
+                            </th>
+
+                            <th>
+                                Admission No.
+                            </th>
+
+                            <th>
+                                Class
+                            </th>
+
+                            <th>
+                                Academic Year
+                            </th>
+
+                            <th>
+                                Parent
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <!-- TABLE BODY -->
+
+                    <tbody>
+
+
+                    {% for student in students %}
+
+
+                        <tr>
+
+
+                            <!-- ==========================
+                                 ID
+                            =========================== -->
+
+                            <td>
+                                {{ student[0] }}
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 STUDENT NAME
+                            =========================== -->
+
+                            <td>
+
+                                <strong>
+                                    {{ student[1] }}
+                                </strong>
+
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 ADMISSION NUMBER
+                            =========================== -->
+
+                            <td>
+                                {{ student[2] }}
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 CLASS
+                            =========================== -->
+
+                            <td>
+                                {{ student[8] or "Not Assigned" }}
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 ACADEMIC YEAR
+                            =========================== -->
+
+                            <td>
+                                {{ student[9] or "Not Assigned" }}
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 PARENT
+                            =========================== -->
+
+                            <td>
+                                {{ student[4] or "Not Provided" }}
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 EMAIL
+                            =========================== -->
+
+                            <td>
+                                {{ student[6] }}
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 STATUS
+                            =========================== -->
+
+                            <td>
+
+                                {% if student[7] %}
+
+                                    <span class="status-active">
+                                        ● Active
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-inactive">
+                                        ● Inactive
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+
+                            <!-- ==========================
+                                 ACTIVATE / DEACTIVATE
+                            =========================== -->
+
+                            <td>
+
+                                <form
+                                    action="{{ url_for(
+                                        'student.toggle_student',
+                                        student_id=student[0]
+                                    ) }}"
+                                    method="POST"
+                                    style="display: inline;"
+                                >
+
+                                    {% if student[7] %}
+
+                                        <button
+                                            type="submit"
+                                            class="status-button deactivate"
+                                        >
+                                            Deactivate
+                                        </button>
+
+                                    {% else %}
+
+                                        <button
+                                            type="submit"
+                                            class="status-button activate"
+                                        >
+                                            Activate
+                                        </button>
+
+                                    {% endif %}
+
+                                </form>
+
+                            </td>
+
+
+                        </tr>
+
+
+                    {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ==================================================
+                 NO STUDENTS
+            =================================================== -->
+
+            {% else %}
+
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    👧
+                </div>
+
+                <h3>
+                    No Students Yet
+                </h3>
+
+                <p>
+                    No student accounts have been created.
+                    Start by adding the first student.
+                </p>
+
+                <a href="/admin/students/add"
+                   class="dashboard-add-button">
+
+                    ➕ Add First Student
+
+                </a>
+
+            </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+             FOOTER
+        =================================================== -->
+
+        <div class="dashboard-footer">
+
+            <span>
+                🧸 Smart Preschool Learning
+            </span>
+
+            <span>
+                Learn • Play • Grow 🌈
+            </span>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

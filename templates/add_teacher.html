@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Add Teacher - Smart Preschool Learning</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div style="font-size: 38px;">
+                🧸
+            </div>
+
+            <h2>
+                Smart <span>Preschool</span>
+            </h2>
+
+            <small>Learning Analytics</small>
+
+        </div>
+
+
+        <ul class="sidebar-menu">
+
+            <li>
+                <a href="/admin/dashboard">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/teachers" class="active">
+                    👩‍🏫 Teachers
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    👧 Students
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    👨‍👩‍👧 Parents
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    🏫 Classes
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📅 Academic Years
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📚 Learning Activities
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📊 Analytics
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    💡 Recommendations
+                </a>
+            </li>
+
+        </ul>
+
+
+        <div class="sidebar-logout">
+
+            <a href="/logout">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+
+        <!-- TOP BAR -->
+
+        <div class="topbar">
+
+            <div>
+
+                <h1>
+                    👩‍🏫 Add Teacher
+                </h1>
+
+                <p>
+                    Create a new teacher account
+                </p>
+
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div class="profile-avatar">
+                    👑
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ session["user_name"] }}
+                    </strong>
+
+                    <small>
+                        Administrator
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FORM CARD -->
+
+        <div class="content-card teacher-form-card">
+
+            <div class="form-title">
+
+                <div class="form-big-icon">
+                    👩‍🏫
+                </div>
+
+                <div>
+
+                    <h2>
+                        Teacher Information
+                    </h2>
+
+                    <p>
+                        Enter the details to create a teacher account.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- MODIFIED: autocomplete disabled -->
+
+            <form method="POST" autocomplete="off">
+
+
+                <!-- NAME -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="name">
+                            👤 Teacher Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Enter teacher name"
+                            autocomplete="off"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="form-group">
+
+                        <label for="email">
+                            📧 Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="teacher@example.com"
+                            autocomplete="off"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- MOBILE + QUALIFICATION -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="mobile">
+                            📱 Mobile Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="mobile"
+                            name="mobile"
+                            placeholder="Enter mobile number"
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="qualification">
+                            🎓 Qualification
+                        </label>
+
+                        <input
+                            type="text"
+                            id="qualification"
+                            name="qualification"
+                            placeholder="e.g. B.Ed, M.Ed"
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="form-group">
+
+                    <label for="password">
+                        🔒 Login Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Minimum 6 characters"
+                        minlength="6"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <small class="field-help">
+                        This password will be used by the teacher to log in.
+                    </small>
+
+                </div>
+
+
+                <!-- BUTTONS -->
+
+                <div class="form-buttons">
+
+                    <a href="/admin/teachers"
+                       class="cancel-button">
+
+                        ← Cancel
+
+                    </a>
+
+
+                    <button type="submit"
+                            class="save-teacher-button">
+
+                        👩‍🏫 Create Teacher
+
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+
+        <!-- INFORMATION CARD -->
+
+        <div class="content-card information-card">
+
+            <div class="info-icon">
+                💡
+            </div>
+
+            <div>
+
+                <h3>
+                    Teacher Account
+                </h3>
+
+                <p>
+                    After creating this account, the teacher can use
+                    the email and password to log in to the
+                    Smart Preschool Learning system.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="dashboard-footer">
+
+            <span>
+                🧸 Smart Preschool Learning
+            </span>
+
+            <span>
+                Learn • Play • Grow 🌈
+            </span>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

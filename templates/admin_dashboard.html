@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - Smart Preschool Learning</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="admin-layout">
+
+
+    <!-- ======================================
+         SIDEBAR
+    ======================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div style="font-size: 38px;">
+                🧸
+            </div>
+
+            <h2>
+                Smart <span>Preschool</span>
+            </h2>
+
+            <small>Learning Analytics</small>
+
+        </div>
+
+
+        <ul class="sidebar-menu">
+
+            <li>
+                <a href="/admin/dashboard" class="active">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/teachers">
+                    👩‍🏫 Teachers
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/students">
+                    👧 Students
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    👨‍👩‍👧 Parents
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    🏫 Classes
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📅 Academic Years
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📚 Learning Activities
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📊 Analytics
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    💡 Recommendations
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    ⚙️ Settings
+                </a>
+            </li>
+
+        </ul>
+
+
+        <div class="sidebar-logout">
+
+            <a href="/logout">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ======================================
+         MAIN CONTENT
+    ======================================= -->
+
+    <main class="main-content">
+
+
+        <!-- ======================================
+             TOP BAR
+        ======================================= -->
+
+        <div class="topbar">
+
+            <div>
+
+                <h1>
+                    👋 Welcome, {{ session["user_name"] }}!
+                </h1>
+
+                <p>
+                    Here's what's happening in your preschool today.
+                </p>
+
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div class="profile-avatar">
+                    👑
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ session["user_name"] }}
+                    </strong>
+
+                    <small>
+                        Administrator
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ======================================
+             STATISTICS
+        ======================================= -->
+
+        <div class="dashboard-grid">
+
+
+            <!-- ==================================
+                 TEACHERS
+            =================================== -->
+
+            <div class="stat-card blue">
+
+                <div class="stat-icon">
+                    👩‍🏫
+                </div>
+
+                <h3>
+                    Teachers
+                </h3>
+
+                <div class="number">
+                    {{ teacher_count }}
+                </div>
+
+                <p>
+                    Registered teachers
+                </p>
+
+            </div>
+
+
+
+            <!-- ==================================
+                 STUDENTS
+            =================================== -->
+
+            <div class="stat-card pink">
+
+                <div class="stat-icon">
+                    👧
+                </div>
+
+                <h3>
+                    Students
+                </h3>
+
+                <div class="number">
+                    {{ student_count }}
+                </div>
+
+                <p>
+                    Registered students
+                </p>
+
+            </div>
+
+
+
+            <!-- ==================================
+                 CLASSES
+            =================================== -->
+
+            <div class="stat-card yellow">
+
+                <div class="stat-icon">
+                    🏫
+                </div>
+
+                <h3>
+                    Classes
+                </h3>
+
+                <div class="number">
+                    {{ class_count }}
+                </div>
+
+                <p>
+                    Available classes
+                </p>
+
+            </div>
+
+
+
+            <!-- ==================================
+                 LEARNING ACTIVITIES
+            =================================== -->
+
+            <div class="stat-card green">
+
+                <div class="stat-icon">
+                    📚
+                </div>
+
+                <h3>
+                    Activities
+                </h3>
+
+                <div class="number">
+                    {{ activity_count }}
+                </div>
+
+                <p>
+                    Learning records
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ======================================
+             QUICK ACTIONS
+        ======================================= -->
+
+        <div class="content-card">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        🚀 Quick Actions
+                    </h2>
+
+                    <p>
+                        Manage your preschool easily
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="quick-actions">
+
+
+                <!-- ==================================
+                     ADD TEACHER
+                =================================== -->
+
+                <a href="/admin/teachers/add"
+                   class="action-card action-blue">
+
+                    <div class="action-icon">
+                        👩‍🏫
+                    </div>
+
+                    <h3>
+                        Add Teacher
+                    </h3>
+
+                    <p>
+                        Create a teacher account
+                    </p>
+
+                </a>
+
+
+
+                <!-- ==================================
+                     ADD STUDENT
+                =================================== -->
+
+                <a href="/admin/students/add"
+                   class="action-card action-pink">
+
+                    <div class="action-icon">
+                        👧
+                    </div>
+
+                    <h3>
+                        Add Student
+                    </h3>
+
+                    <p>
+                        Register a new student
+                    </p>
+
+                </a>
+
+
+
+                <!-- ==================================
+                     MANAGE CLASSES
+                =================================== -->
+
+                <a href="#"
+                   class="action-card action-yellow">
+
+                    <div class="action-icon">
+                        🏫
+                    </div>
+
+                    <h3>
+                        Manage Classes
+                    </h3>
+
+                    <p>
+                        View preschool classes
+                    </p>
+
+                </a>
+
+
+
+                <!-- ==================================
+                     VIEW ANALYTICS
+                =================================== -->
+
+                <a href="#"
+                   class="action-card action-green">
+
+                    <div class="action-icon">
+                        📊
+                    </div>
+
+                    <h3>
+                        View Analytics
+                    </h3>
+
+                    <p>
+                        Analyze student progress
+                    </p>
+
+                </a>
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ======================================
+             SYSTEM STATUS
+        ======================================= -->
+
+        <div class="content-card">
+
+            <h2>
+                🌟 System Overview
+            </h2>
+
+            <div class="system-message">
+
+                <div class="message-icon">
+                    🎉
+                </div>
+
+                <div>
+
+                    <h3>
+                        Smart Preschool Learning is ready!
+                    </h3>
+
+                    <p>
+                        Start by adding teachers and students.
+                        Their learning activities, attendance and
+                        assessments will appear here as the system grows.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ======================================
+             FOOTER
+        ======================================= -->
+
+        <div class="dashboard-footer">
+
+            <span>
+                🧸 Smart Preschool Learning
+            </span>
+
+            <span>
+                Learn • Play • Grow 🌈
+            </span>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

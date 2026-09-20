@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard | Smart Preschool Learning</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="student-page">
+
+<div class="student-layout">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="student-sidebar">
+
+        <!-- LOGO -->
+
+        <div class="student-brand">
+
+            <div class="student-brand-icon">
+                🧸
+            </div>
+
+            <div>
+                <h2>Smart<span>Preschool</span></h2>
+                <p>Learning Analytics</p>
+            </div>
+
+        </div>
+
+
+        <!-- MENU -->
+
+        <nav class="student-nav">
+
+            <p class="student-nav-title">
+                MAIN MENU
+            </p>
+
+            <a href="/student/dashboard"
+               class="student-nav-link active">
+
+                <span>🏠</span>
+                <span>Dashboard</span>
+
+            </a>
+
+
+            <a href="#activities"
+               class="student-nav-link">
+
+                <span>📚</span>
+                <span>My Activities</span>
+
+            </a>
+
+
+            <a href="#progress"
+               class="student-nav-link">
+
+                <span>📊</span>
+                <span>My Progress</span>
+
+            </a>
+
+
+            <a href="#recommendations"
+               class="student-nav-link">
+
+                <span>💡</span>
+                <span>Recommendations</span>
+
+            </a>
+
+
+            <a href="#activities"
+               class="student-nav-link">
+
+                <span>📝</span>
+                <span>Assessments</span>
+
+            </a>
+
+        </nav>
+
+
+        <!-- BOTTOM -->
+
+        <div class="student-sidebar-bottom">
+
+            <div class="student-side-message">
+
+                <div class="message-icon">
+                    🌈
+                </div>
+
+                <div>
+                    <strong>
+                        Keep Learning!
+                    </strong>
+
+                    <small>
+                        Every day is a new adventure.
+                    </small>
+                </div>
+
+            </div>
+
+
+            <a href="/logout"
+               class="student-logout">
+
+                <span>🚪</span>
+                <span>Logout</span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="student-main">
+
+
+        <!-- =================================================
+             TOP HEADER
+        ================================================== -->
+
+        <header class="student-topbar">
+
+            <div>
+
+                <p class="student-breadcrumb">
+                    Home / Dashboard
+                </p>
+
+                <h1>
+                    Student Dashboard
+                </h1>
+
+            </div>
+
+
+            <div class="student-user">
+
+                <div class="student-user-avatar">
+                    👧
+                </div>
+
+                <div class="student-user-info">
+
+                    <strong>
+                        {{ student_name }}
+                    </strong>
+
+                    <span>
+                        Student
+                    </span>
+
+                </div>
+
+                <div class="student-user-arrow">
+                    ▾
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             WELCOME BANNER
+        ================================================== -->
+
+        <section class="student-welcome">
+
+            <div class="welcome-content">
+
+                <div class="welcome-small">
+                    ✨ Welcome back!
+                </div>
+
+                <h2>
+                    Hello, {{ student_name }}! 👋
+                </h2>
+
+                <p>
+                    Ready to learn something new today?
+                    Keep exploring, practicing and growing! 🌈
+                </p>
+
+
+                <div class="welcome-tags">
+
+                    <span>
+                        🎓 {{ class_name or "Class not assigned" }}
+                    </span>
+
+                    <span>
+                        📅 {{ academic_year or "Academic Year" }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="welcome-illustration">
+
+                <div class="sun">
+                    ☀️
+                </div>
+
+                <div class="cloud cloud-one">
+                    ☁️
+                </div>
+
+                <div class="cloud cloud-two">
+                    ☁️
+                </div>
+
+                <div class="welcome-character">
+                    🧒
+                </div>
+
+                <div class="rainbow">
+                    🌈
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PROFILE INFORMATION
+        ================================================== -->
+
+        <section class="student-profile-card">
+
+            <div class="profile-left">
+
+                <div class="large-student-avatar">
+                    👧
+                </div>
+
+                <div>
+
+                    <span class="profile-label">
+                        STUDENT PROFILE
+                    </span>
+
+                    <h2>
+                        {{ student_name }}
+                    </h2>
+
+                    <p>
+                        Admission No:
+                        <strong>{{ admission_number }}</strong>
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-details">
+
+                <div class="profile-detail">
+
+                    <span>
+                        🏫
+                    </span>
+
+                    <div>
+                        <small>Class</small>
+
+                        <strong>
+                            {{ class_name or "Not Assigned" }}
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="profile-detail">
+
+                    <span>
+                        📅
+                    </span>
+
+                    <div>
+                        <small>Academic Year</small>
+
+                        <strong>
+                            {{ academic_year or "Not Assigned" }}
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="profile-detail">
+
+                    <span>
+                        👨‍👩‍👧
+                    </span>
+
+                    <div>
+                        <small>Parent</small>
+
+                        <strong>
+                            {{ parent_name or "Not Available" }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             STATISTICS
+        ================================================== -->
+
+        <section class="student-stat-grid">
+
+
+            <!-- ACTIVITIES -->
+
+            <div class="student-stat-card activities-card">
+
+                <div class="stat-icon">
+                    📚
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Learning Activities
+                    </span>
+
+                    <strong>
+                        {{ activity_count }}
+                    </strong>
+
+                    <small>
+                        Total activities
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- SCORE -->
+
+            <div class="student-stat-card score-card">
+
+                <div class="stat-icon">
+                    ⭐
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Average Score
+                    </span>
+
+                    <strong>
+                        {{ average_score }}%
+                    </strong>
+
+                    <small>
+                        Overall performance
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- ATTEMPTS -->
+
+            <div class="student-stat-card attempts-card">
+
+                <div class="stat-icon">
+                    🎯
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Total Attempts
+                    </span>
+
+                    <strong>
+                        {{ total_attempts }}
+                    </strong>
+
+                    <small>
+                        Practice attempts
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- LEVEL -->
+
+            <div class="student-stat-card level-card">
+
+                <div class="stat-icon">
+                    🏆
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Learning Level
+                    </span>
+
+                    <strong>
+
+                        {% if average_score >= 80 %}
+                            Excellent
+                        {% elif average_score >= 60 %}
+                            Good
+                        {% elif average_score > 0 %}
+                            Improving
+                        {% else %}
+                            Starting
+                        {% endif %}
+
+                    </strong>
+
+                    <small>
+                        Keep going!
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PROGRESS + LEARNING JOURNEY
+        ================================================== -->
+
+        <section class="student-two-column"
+                 id="progress">
+
+
+            <!-- PROGRESS CARD -->
+
+            <div class="student-white-card progress-card">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-icon">
+                            📊
+                        </span>
+
+                        <div>
+
+                            <h2>
+                                My Learning Progress
+                            </h2>
+
+                            <p>
+                                Your overall learning performance
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <span class="progress-badge">
+                        {{ average_score }}%
+                    </span>
+
+                </div>
+
+
+                <div class="progress-main">
+
+                    <div class="progress-circle"
+     style="--progress: {{ average_score }};">
+
+    <div class="progress-circle-inner">
+
+        <strong>
+            {{ average_score }}%
+        </strong>
+
+        <span>
+            Score
+        </span>
+
+    </div>
+
+</div>
+
+
+                    <div class="progress-description">
+
+                        {% if average_score >= 80 %}
+
+                            <h3>
+                                🌟 Excellent Work!
+                            </h3>
+
+                            <p>
+                                You are doing a wonderful job.
+                                Keep learning and exploring new things!
+                            </p>
+
+                        {% elif average_score >= 60 %}
+
+                            <h3>
+                                😊 Good Progress!
+                            </h3>
+
+                            <p>
+                                You are learning well.
+                                Keep practicing to improve even more!
+                            </p>
+
+                        {% elif average_score > 0 %}
+
+                            <h3>
+                                🌱 Keep Practicing!
+                            </h3>
+
+                            <p>
+                                Every practice session helps you
+                                become better. Keep going!
+                            </p>
+
+                        {% else %}
+
+                            <h3>
+                                🚀 Your Journey Starts Here!
+                            </h3>
+
+                            <p>
+                                Complete your first learning activity
+                                and start building your learning journey.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="progress-bar-section">
+
+                    <div class="progress-bar-label">
+
+                        <span>
+                            Overall Progress
+                        </span>
+
+                        <strong>
+                            {{ average_score }}%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="progress-track">
+
+                        <div class="progress-fill"
+                             style="width: {{ average_score }}%;">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- LEARNING JOURNEY -->
+
+            <div class="student-white-card journey-card">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-icon">
+                            🏆
+                        </span>
+
+                        <div>
+
+                            <h2>
+                                Learning Journey
+                            </h2>
+
+                            <p>
+                                Your achievements
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="journey-item">
+
+                    <div class="journey-icon completed">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Student Profile
+                        </strong>
+
+                        <small>
+                            Profile created successfully
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="journey-line"></div>
+
+
+                <div class="journey-item">
+
+                    <div class="journey-icon
+                    {% if activity_count > 0 %}
+                        completed
+                    {% else %}
+                        pending
+                    {% endif %}">
+
+                        {% if activity_count > 0 %}
+                            ✓
+                        {% else %}
+                            📚
+                        {% endif %}
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            First Learning Activity
+                        </strong>
+
+                        <small>
+
+                            {% if activity_count > 0 %}
+                                Activity completed!
+                            {% else %}
+                                Start your first activity
+                            {% endif %}
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="journey-line"></div>
+
+
+                <div class="journey-item">
+
+                    <div class="journey-icon
+                    {% if average_score >= 80 %}
+                        completed
+                    {% else %}
+                        pending
+                    {% endif %}">
+
+                        {% if average_score >= 80 %}
+                            ✓
+                        {% else %}
+                            ⭐
+                        {% endif %}
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Learning Star
+                        </strong>
+
+                        <small>
+
+                            {% if average_score >= 80 %}
+                                Achievement unlocked!
+                            {% else %}
+                                Reach 80% average score
+                            {% endif %}
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             RECENT ACTIVITIES
+        ================================================== -->
+
+        <section class="student-white-card full-card"
+                 id="activities">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-icon">
+                        📚
+                    </span>
+
+                    <div>
+
+                        <h2>
+                            Recent Learning Activities
+                        </h2>
+
+                        <p>
+                            Your latest learning activities
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <span class="view-label">
+                    Latest 5
+                </span>
+
+            </div>
+
+
+            {% if recent_activities %}
+
+            <div class="student-table-wrapper">
+
+                <table class="student-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Activity
+                            </th>
+
+                            <th>
+                                Score
+                            </th>
+
+                            <th>
+                                Attempts
+                            </th>
+
+                            <th>
+                                Time Taken
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    {% for activity in recent_activities %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="activity-name">
+
+                                    <div class="activity-icon">
+                                        📖
+                                    </div>
+
+                                    <strong>
+                                        {{ activity[0] }}
+                                    </strong>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="score-pill">
+
+                                    {% if activity[2] and activity[2] > 0 %}
+
+                                        {{ activity[1] or 0 }}/{{ activity[2] }}
+
+                                    {% else %}
+
+                                        {{ activity[1] or 0 }}
+
+                                    {% endif %}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+                                {{ activity[3] }}
+                            </td>
+
+
+                            <td>
+
+                                {% if activity[4] is not none %}
+
+                                    ⏱ {{ activity[4] }} sec
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ activity[5] }}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="student-empty">
+
+                <div class="empty-illustration">
+                    📚
+                </div>
+
+                <h3>
+                    No Learning Activities Yet
+                </h3>
+
+                <p>
+                    Your learning activities will appear here
+                    when your teacher records them.
+                </p>
+
+                <div class="empty-decoration">
+                    🌈 ✨ 🧸
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- =================================================
+             RECOMMENDATIONS
+        ================================================== -->
+
+        <section class="student-white-card full-card"
+                 id="recommendations">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-icon recommendation-section-icon">
+                        💡
+                    </span>
+
+                    <div>
+
+                        <h2>
+                            Personalized Recommendations
+                        </h2>
+
+                        <p>
+                            Activities selected to support your learning
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% if recommendations %}
+
+                <div class="recommendation-grid">
+
+                {% for recommendation in recommendations %}
+
+                    <div class="recommendation-card">
+
+                        <div class="recommendation-top">
+
+                            <div class="recommendation-big-icon">
+                                💡
+                            </div>
+
+                            <span>
+                                Recommended
+                            </span>
+
+                        </div>
+
+
+                        <h3>
+                            {{ recommendation[0] }}
+                        </h3>
+
+
+                        <p>
+                            {{ recommendation[1] }}
+                        </p>
+
+
+                        <small>
+                            📅 {{ recommendation[2] }}
+                        </small>
+
+                    </div>
+
+                {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="student-empty recommendation-empty">
+
+                    <div class="empty-illustration">
+                        💡
+                    </div>
+
+                    <h3>
+                        Your Recommendations Are Coming!
+                    </h3>
+
+                    <p>
+                        As you complete more activities,
+                        the system will generate personalized
+                        learning recommendations for you.
+                    </p>
+
+                    <div class="empty-decoration">
+                        🧠 ✨ 📚
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="student-footer">
+
+            <div>
+                🧸 <strong>Smart Preschool Learning</strong>
+            </div>
+
+            <div>
+                Learn • Play • Grow 🌈
+            </div>
+
+        </footer>
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

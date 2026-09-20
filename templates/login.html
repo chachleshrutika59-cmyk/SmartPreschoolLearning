@@ -2,128 +2,87 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Login - Smart Preschool Learning</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
-
 </head>
 
 <body>
 
-    <!-- Navigation -->
+<div class="login-page">
 
-    <nav class="navbar">
+    <div class="login-card">
 
-        <div class="logo">
-            Smart <span>Preschool</span>
+        <div class="login-icon">
+            🎨
         </div>
 
-        <a href="/register" class="nav-button">
-            Register
-        </a>
+        <h1>Welcome Back! 🌈</h1>
 
-    </nav>
+        <p class="login-subtitle">
+            Let's learn, play and grow together!
+        </p>
 
+        <form method="POST">
 
-    <!-- Main -->
+            <div class="form-group">
 
-    <main class="main-container">
+                <label for="email">
+                    📧 Email
+                </label>
 
-        <!-- Decorative Shapes -->
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
 
-        <div class="circle circle-one"></div>
-        <div class="circle circle-two"></div>
-        <div class="circle circle-three"></div>
-
-
-        <!-- Login Card -->
-
-        <div class="login-card">
-
-            <div class="icon">
-                🎨
             </div>
 
-            <h1>Welcome Back!</h1>
 
-            <p class="subtitle">
-                Let's learn, play and grow together 🌈
-            </p>
+            <div class="form-group">
 
+                <label for="password">
+                    🔒 Password
+                </label>
 
-            <form method="POST">
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
 
-                <div class="form-group">
-
-                    <label for="email">
-                        Email
-                    </label>
-
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="Enter your email"
-                        required
-                    >
-
-                </div>
+            </div>
 
 
-                <div class="form-group">
+            <button type="submit" class="btn btn-primary">
+                🚀 Login
+            </button>
 
-                    <label for="password">
-                        Password
-                    </label>
-
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        required
-                    >
-
-                </div>
+        </form>
 
 
-                <button
-                    type="submit"
-                    class="login-button">
+        <div class="login-footer">
 
-                    Login 🚀
+            <span>Smart Preschool Learning</span>
 
-                </button>
-
-            </form>
-
-
-            <div class="register-link">
-
-                Don't have an account?
-
-                <a href="/register">
-                    Create Account
-                </a>
-
+            <div class="footer-icons">
+                🌟 🧸 🎨 📚
             </div>
 
         </div>
 
+    </div>
 
-        <!-- Bottom Color Bar -->
-
-        <div class="color-bar"></div>
-
-    </main>
+</div>
 
 </body>
-
 </html>
