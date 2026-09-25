@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ class_data[1] }} - Smart Preschool
+    </title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #263238;
+        }
+
+        .header {
+            background: linear-gradient(
+                135deg,
+                #6c63ff,
+                #8e7dff
+            );
+
+            color: white;
+
+            padding: 25px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+        }
+
+        .header p {
+            margin-top: 7px;
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #6c63ff;
+            background: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 35px 40px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.07);
+        }
+
+        .section h2 {
+            margin-bottom: 18px;
+        }
+
+        .teacher-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            background: #f8f7ff;
+
+            padding: 18px;
+
+            border-radius: 12px;
+        }
+
+        .teacher-info strong {
+            display: block;
+            font-size: 19px;
+            margin-bottom: 5px;
+        }
+
+        .teacher-info span {
+            color: #667085;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+
+            padding: 10px 15px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        select {
+            width: 100%;
+
+            padding: 12px;
+
+            border: 1px solid #d0d5dd;
+
+            border-radius: 8px;
+
+            background: white;
+
+            font-size: 15px;
+        }
+
+        .assign-btn {
+            padding: 12px 22px;
+
+            border: none;
+
+            background: #6c63ff;
+
+            color: white;
+
+            border-radius: 8px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .assign-btn:hover {
+            background: #584ff0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px;
+
+            text-align: left;
+
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f7ff;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: #667085;
+        }
+
+        @media (max-width: 700px) {
+
+            .header {
+                padding: 20px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .teacher-box {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div>
+
+        <h1>
+            {{ class_data[1] }}
+        </h1>
+
+        <p>
+            Academic Year: {{ academic_year_name }}
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('classes.class_list') }}"
+        class="back-btn"
+    >
+        ← All Classes
+    </a>
+
+</header>
+
+
+<main class="container">
+
+
+    <!-- =================================================
+         CURRENT CLASS TEACHER
+    ================================================== -->
+
+    <section class="section">
+
+        <h2>
+            👩‍🏫 Class Teacher
+        </h2>
+
+
+        {% if current_teacher %}
+
+        <div class="teacher-box">
+
+            <div class="teacher-info">
+
+                <strong>
+                    {{ current_teacher[2] }}
+                </strong>
+
+                <span>
+                    {{ current_teacher[3] }}
+                </span>
+
+                {% if current_teacher[4] %}
+
+                <br>
+
+                <span>
+                    {{ current_teacher[4] }}
+                </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'classes.remove_teacher',
+                    class_id=class_data[0]
+                ) }}"
+            >
+
+                <button
+                    type="submit"
+                    class="remove-btn"
+                    onclick="return confirm(
+                        'Remove this class teacher?'
+                    );"
+                >
+
+                    Remove Teacher
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        {% else %}
+
+        <p>
+            No class teacher has been assigned yet.
+        </p>
+
+        {% endif %}
+
+
+    </section>
+
+
+    <!-- =================================================
+         ASSIGN TEACHER
+    ================================================== -->
+
+    <section class="section">
+
+        <h2>
+            Assign Class Teacher
+        </h2>
+
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'classes.assign_teacher',
+                class_id=class_data[0]
+            ) }}"
+        >
+
+            <div class="form-row">
+
+
+                <div class="form-group">
+
+                    <label>
+                        Select Teacher
+                    </label>
+
+
+                    <select
+                        name="teacher_id"
+                        required
+                    >
+
+                        <option value="">
+                            -- Select Teacher --
+                        </option>
+
+
+                        {% for teacher in teachers %}
+
+                        <option
+                            value="{{ teacher[0] }}"
+                            {% if current_teacher
+                                  and current_teacher[1] == teacher[0] %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {{ teacher[1] }}
+
+                            {% if teacher[2] %}
+                                - {{ teacher[2] }}
+                            {% endif %}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="assign-btn"
+                >
+
+                    Assign Teacher
+
+                </button>
+
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- =================================================
+         STUDENTS
+    ================================================== -->
+
+    <section class="section">
+
+        <h2>
+            👧 Students in {{ class_data[1] }}
+        </h2>
+
+
+        {% if students %}
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        #
+                    </th>
+
+                    <th>
+                        Student Name
+                    </th>
+
+                    <th>
+                        Admission No.
+                    </th>
+
+                    <th>
+                        Gender
+                    </th>
+
+                    <th>
+                        Enrollment Date
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for student in students %}
+
+                <tr>
+
+                    <td>
+                        {{ loop.index }}
+                    </td>
+
+                    <td>
+                        <strong>
+                            {{ student[1] }}
+                        </strong>
+                    </td>
+
+                    <td>
+                        {{ student[2] }}
+                    </td>
+
+                    <td>
+                        {{ student[3] or '-' }}
+                    </td>
+
+                    <td>
+                        {{ student[4] }}
+                    </td>
+
+                    <td>
+                        {{ student[5] }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+        {% else %}
+
+        <div class="empty">
+
+            No students are currently enrolled in this class.
+
+        </div>
+
+        {% endif %}
+
+
+    </section>
+
+
+</main>
+
+
+</body>
+
+</html>

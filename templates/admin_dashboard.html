@@ -13,6 +13,206 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
 
+
+    <!-- =====================================================
+         ADMIN SIDEBAR LAYOUT FIX
+         Menu scrolls, Logout stays at bottom
+    ====================================================== -->
+
+  <style>
+
+/* =========================================================
+   ADMIN SIDEBAR - FINAL FIX
+========================================================= */
+
+.admin-layout {
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.admin-layout .sidebar {
+    height: 100vh !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   SIDEBAR LOGO
+========================================================= */
+
+.admin-layout .sidebar-logo {
+    flex: 0 0 auto !important;
+}
+
+
+/* =========================================================
+   SIDEBAR MENU
+   This is the ONLY scrolling section
+========================================================= */
+
+.admin-layout .sidebar-menu {
+    display: block !important;
+
+    flex: 1 1 0 !important;
+
+    min-height: 0 !important;
+
+    height: 0 !important;
+
+    max-height: none !important;
+
+    overflow-y: auto !important;
+
+    overflow-x: hidden !important;
+
+    margin: 0 !important;
+
+    padding-top: 10px !important;
+
+    padding-bottom: 20px !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   EVERY MENU ITEM
+========================================================= */
+
+.admin-layout .sidebar-menu li {
+    display: block !important;
+
+    height: auto !important;
+
+    min-height: 50px !important;
+
+    flex-shrink: 0 !important;
+}
+
+
+/* =========================================================
+   MENU LINKS
+========================================================= */
+
+.admin-layout .sidebar-menu li a {
+    display: flex;
+
+    align-items: center;
+
+    min-height: 50px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+.admin-layout .sidebar-menu::-webkit-scrollbar {
+    width: 7px;
+}
+
+.admin-layout .sidebar-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-layout .sidebar-menu::-webkit-scrollbar-thumb {
+    background: #c8c8d5;
+
+    border-radius: 10px;
+}
+
+.admin-layout .sidebar-menu::-webkit-scrollbar-thumb:hover {
+    background: #9999aa;
+}
+
+
+/* =========================================================
+   LOGOUT
+   NOT PART OF SCROLLING MENU
+========================================================= */
+
+.admin-layout .sidebar-logout {
+    flex: 0 0 auto !important;
+
+    width: 100%;
+
+    margin: 0 !important;
+
+    padding: 12px 20px 20px !important;
+
+    background: #ffffff;
+
+    box-sizing: border-box;
+
+    position: relative;
+
+    z-index: 10;
+}
+
+
+/* =========================================================
+   LOGOUT BUTTON
+========================================================= */
+
+.admin-layout .sidebar-logout a {
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 10px;
+
+    width: 100%;
+
+    min-height: 48px;
+
+    padding: 13px 16px !important;
+
+    box-sizing: border-box;
+
+    text-decoration: none;
+
+    border-radius: 12px;
+
+    color: #dc3545 !important;
+
+    font-weight: 600;
+
+    transition: all 0.2s ease;
+}
+
+
+/* =========================================================
+   LOGOUT HOVER
+========================================================= */
+
+.admin-layout .sidebar-logout a:hover {
+    background: #fff1f2 !important;
+
+    color: #c82333 !important;
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.admin-layout .main-content {
+    min-height: 100vh;
+}
+
+</style>
 </head>
 
 
@@ -21,11 +221,16 @@
 <div class="admin-layout">
 
 
-    <!-- ======================================
+    <!-- =====================================================
          SIDEBAR
-    ======================================= -->
+    ====================================================== -->
 
     <aside class="sidebar">
+
+
+        <!-- =================================================
+             SIDEBAR LOGO
+        ================================================== -->
 
         <div class="sidebar-logo">
 
@@ -37,364 +242,618 @@
                 Smart <span>Preschool</span>
             </h2>
 
-            <small>Learning Analytics</small>
+            <small>
+                Learning Analytics
+            </small>
 
         </div>
 
 
+
+        <!-- =================================================
+             SIDEBAR MENU
+             This section scrolls
+        ================================================== -->
+
         <ul class="sidebar-menu">
 
+
+            <!-- =================================================
+                 DASHBOARD
+            ================================================== -->
+
             <li>
-                <a href="/admin/dashboard" class="active">
+
+                <a href="{{ url_for('admin_dashboard') }}"
+                   class="active">
+
                     🏠 Dashboard
+
                 </a>
+
             </li>
 
+
+
+            <!-- =================================================
+                 TEACHERS
+            ================================================== -->
+
             <li>
-                <a href="/admin/teachers">
+
+                <a href="{{ url_for('teacher.teacher_list') }}">
+
                     👩‍🏫 Teachers
+
                 </a>
+
             </li>
 
+
+
+            <!-- =================================================
+                 STUDENTS
+            ================================================== -->
+
             <li>
+
                 <a href="/admin/students">
+
                     👧 Students
+
                 </a>
+
             </li>
 
+
+
+            <!-- =================================================
+                 PARENTS
+                 Not implemented yet
+            ================================================== -->
+
             <li>
+
                 <a href="#">
+
                     👨‍👩‍👧 Parents
+
                 </a>
+
             </li>
 
+
+
+            <!-- =================================================
+                 CLASSES
+            ================================================== -->
+
             <li>
-                <a href="#">
+
+                <a href="{{ url_for('classes.class_list') }}">
+
                     🏫 Classes
+
                 </a>
+
             </li>
 
-            <li>
-                <a href="#">
-                    📅 Academic Years
-                </a>
-            </li>
+
+
+            <!-- =================================================
+                 ACADEMIC YEARS
+                 Not implemented yet
+            ================================================== -->
 
             <li>
+
+               <li>
+    <a href="{{ url_for('academic_year.academic_year_list') }}">
+        📅 Academic Years
+    </a>
+</li>
+
+            </li>
+
+
+
+            <!-- =================================================
+                 LEARNING ACTIVITIES
+                 Not implemented yet
+            ================================================== -->
+
+            <li>
+
                 <a href="#">
+
                     📚 Learning Activities
+
                 </a>
+
             </li>
 
+
+
+            <!-- =================================================
+                 ANALYTICS
+                 Not implemented yet
+            ================================================== -->
+
             <li>
+
                 <a href="#">
+
                     📊 Analytics
+
                 </a>
+
             </li>
 
+
+
+            <!-- =================================================
+                 RECOMMENDATIONS
+                 Not implemented yet
+            ================================================== -->
+
             <li>
+
                 <a href="#">
+
                     💡 Recommendations
+
                 </a>
+
             </li>
 
+
+
+            <!-- =================================================
+                 SETTINGS
+                 Last menu item
+            ================================================== -->
+
             <li>
+
                 <a href="#">
+
                     ⚙️ Settings
+
                 </a>
+
             </li>
+
 
         </ul>
 
 
+
+        <!-- =====================================================
+             LOGOUT
+             THIS IS OUTSIDE THE SCROLLING MENU
+
+             Therefore it will ALWAYS remain at the bottom.
+        ====================================================== -->
+
         <div class="sidebar-logout">
 
-            <a href="/logout">
+            <a href="{{ url_for('auth.logout') }}">
+
                 🚪 Logout
+
             </a>
 
         </div>
+
 
     </aside>
 
 
 
-    <!-- ======================================
+    <!-- =====================================================
          MAIN CONTENT
-    ======================================= -->
+    ====================================================== -->
 
     <main class="main-content">
 
 
-        <!-- ======================================
+        <!-- =================================================
              TOP BAR
-        ======================================= -->
+        ================================================== -->
 
         <div class="topbar">
+
 
             <div>
 
                 <h1>
-                    👋 Welcome, {{ session["user_name"] }}!
+
+                    👋 Welcome,
+                    {{ session["user_name"] }}!
+
                 </h1>
 
+
                 <p>
-                    Here's what's happening in your preschool today.
+
+                    Here's what's happening in
+                    your preschool today.
+
                 </p>
 
             </div>
 
 
+
+            <!-- =================================================
+                 ADMIN PROFILE
+            ================================================== -->
+
             <div class="admin-profile">
 
+
                 <div class="profile-avatar">
+
                     👑
+
                 </div>
+
 
                 <div>
 
                     <strong>
+
                         {{ session["user_name"] }}
+
                     </strong>
 
+
                     <small>
+
                         Administrator
+
                     </small>
 
                 </div>
 
+
             </div>
+
 
         </div>
 
 
 
-        <!-- ======================================
+        <!-- =====================================================
              STATISTICS
-        ======================================= -->
+        ====================================================== -->
 
         <div class="dashboard-grid">
 
 
-            <!-- ==================================
+            <!-- =================================================
                  TEACHERS
-            =================================== -->
+            ================================================== -->
 
             <div class="stat-card blue">
 
+
                 <div class="stat-icon">
+
                     👩‍🏫
+
                 </div>
+
 
                 <h3>
+
                     Teachers
+
                 </h3>
 
+
                 <div class="number">
+
                     {{ teacher_count }}
+
                 </div>
 
+
                 <p>
+
                     Registered teachers
+
                 </p>
+
 
             </div>
 
 
 
-            <!-- ==================================
+            <!-- =================================================
                  STUDENTS
-            =================================== -->
+            ================================================== -->
 
             <div class="stat-card pink">
 
+
                 <div class="stat-icon">
+
                     👧
+
                 </div>
+
 
                 <h3>
+
                     Students
+
                 </h3>
 
+
                 <div class="number">
+
                     {{ student_count }}
+
                 </div>
 
+
                 <p>
+
                     Registered students
+
                 </p>
+
 
             </div>
 
 
 
-            <!-- ==================================
+            <!-- =================================================
                  CLASSES
-            =================================== -->
+            ================================================== -->
 
             <div class="stat-card yellow">
 
+
                 <div class="stat-icon">
+
                     🏫
+
                 </div>
+
 
                 <h3>
+
                     Classes
+
                 </h3>
 
+
                 <div class="number">
+
                     {{ class_count }}
+
                 </div>
 
+
                 <p>
+
                     Available classes
+
                 </p>
+
 
             </div>
 
 
 
-            <!-- ==================================
+            <!-- =================================================
                  LEARNING ACTIVITIES
-            =================================== -->
+            ================================================== -->
 
             <div class="stat-card green">
 
+
                 <div class="stat-icon">
+
                     📚
+
                 </div>
+
 
                 <h3>
+
                     Activities
+
                 </h3>
 
+
                 <div class="number">
+
                     {{ activity_count }}
+
                 </div>
 
+
                 <p>
+
                     Learning records
+
                 </p>
 
+
             </div>
+
 
         </div>
 
 
 
-        <!-- ======================================
+        <!-- =====================================================
              QUICK ACTIONS
-        ======================================= -->
+        ====================================================== -->
 
         <div class="content-card">
 
+
             <div class="section-heading">
+
 
                 <div>
 
                     <h2>
+
                         🚀 Quick Actions
+
                     </h2>
 
+
                     <p>
+
                         Manage your preschool easily
+
                     </p>
+
 
                 </div>
 
+
             </div>
+
 
 
             <div class="quick-actions">
 
 
-                <!-- ==================================
+                <!-- =================================================
                      ADD TEACHER
-                =================================== -->
+                ================================================== -->
 
-                <a href="/admin/teachers/add"
+                <a href="{{ url_for('teacher.add_teacher') }}"
                    class="action-card action-blue">
 
+
                     <div class="action-icon">
+
                         👩‍🏫
+
                     </div>
 
+
                     <h3>
+
                         Add Teacher
+
                     </h3>
 
+
                     <p>
+
                         Create a teacher account
+
                     </p>
+
 
                 </a>
 
 
 
-                <!-- ==================================
+                <!-- =================================================
                      ADD STUDENT
-                =================================== -->
+                ================================================== -->
 
                 <a href="/admin/students/add"
                    class="action-card action-pink">
 
+
                     <div class="action-icon">
+
                         👧
+
                     </div>
 
+
                     <h3>
+
                         Add Student
+
                     </h3>
 
+
                     <p>
+
                         Register a new student
+
                     </p>
+
 
                 </a>
 
 
 
-                <!-- ==================================
+                <!-- =================================================
                      MANAGE CLASSES
-                =================================== -->
+                ================================================== -->
 
-                <a href="#"
+                <a href="{{ url_for('classes.class_list') }}"
                    class="action-card action-yellow">
 
+
                     <div class="action-icon">
+
                         🏫
+
                     </div>
 
+
                     <h3>
+
                         Manage Classes
+
                     </h3>
 
+
                     <p>
-                        View preschool classes
+
+                        View classes and assign
+                        class teachers
+
                     </p>
+
 
                 </a>
 
 
 
-                <!-- ==================================
+                <!-- =================================================
                      VIEW ANALYTICS
-                =================================== -->
+                ================================================== -->
 
                 <a href="#"
                    class="action-card action-green">
 
+
                     <div class="action-icon">
+
                         📊
+
                     </div>
 
+
                     <h3>
+
                         View Analytics
+
                     </h3>
 
+
                     <p>
+
                         Analyze student progress
+
                     </p>
+
 
                 </a>
 
@@ -405,62 +864,91 @@
 
 
 
-        <!-- ======================================
+        <!-- =====================================================
              SYSTEM STATUS
-        ======================================= -->
+        ====================================================== -->
 
         <div class="content-card">
 
+
             <h2>
+
                 🌟 System Overview
+
             </h2>
+
 
             <div class="system-message">
 
+
                 <div class="message-icon">
+
                     🎉
+
                 </div>
+
 
                 <div>
 
+
                     <h3>
-                        Smart Preschool Learning is ready!
+
+                        Smart Preschool Learning
+                        is ready!
+
                     </h3>
 
+
                     <p>
-                        Start by adding teachers and students.
-                        Their learning activities, attendance and
-                        assessments will appear here as the system grows.
+
+                        Start by adding teachers and
+                        students. Their learning
+                        activities, attendance and
+                        assessments will appear here
+                        as the system grows.
+
                     </p>
+
 
                 </div>
 
+
             </div>
+
 
         </div>
 
 
 
-        <!-- ======================================
+        <!-- =====================================================
              FOOTER
-        ======================================= -->
+        ====================================================== -->
 
         <div class="dashboard-footer">
 
-            <span>
-                🧸 Smart Preschool Learning
-            </span>
 
             <span>
-                Learn • Play • Grow 🌈
+
+                🧸 Smart Preschool Learning
+
             </span>
+
+
+            <span>
+
+                Learn • Play • Grow 🌈
+
+            </span>
+
 
         </div>
 
 
     </main>
 
+
 </div>
+
 
 </body>
 

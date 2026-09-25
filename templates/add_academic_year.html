@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Add Academic Year - Smart Preschool Learning</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="admin-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="sidebar-logo">
+
+            <div style="font-size: 38px;">
+                🧸
+            </div>
+
+            <h2>
+                Smart <span>Preschool</span>
+            </h2>
+
+            <small>
+                Learning Analytics
+            </small>
+
+        </div>
+
+
+        <ul class="sidebar-menu">
+
+
+            <li>
+                <a href="{{ url_for('admin_dashboard') }}">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{{ url_for('teacher.teacher_list') }}">
+                    👩‍🏫 Teachers
+                </a>
+            </li>
+
+
+            <li>
+                <a href="/admin/students">
+                    👧 Students
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    👨‍👩‍👧 Parents
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{{ url_for('classes.class_list') }}">
+                    🏫 Classes
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{{ url_for('academic_year.academic_year_list') }}"
+                   class="active">
+                    📅 Academic Years
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    📚 Learning Activities
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    📊 Analytics
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    💡 Recommendations
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    ⚙️ Settings
+                </a>
+            </li>
+
+
+        </ul>
+
+
+        <div class="sidebar-logout">
+
+            <a href="{{ url_for('auth.logout') }}">
+
+                🚪 Logout
+
+            </a>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <div class="topbar">
+
+            <div>
+
+                <h1>
+                    ➕ Add Academic Year
+                </h1>
+
+                <p>
+                    Create a new academic year
+                </p>
+
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div class="profile-avatar">
+                    👑
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ session["user_name"] }}
+                    </strong>
+
+                    <small>
+                        Administrator
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             FORM
+        ================================================== -->
+
+        <div class="content-card"
+             style="max-width: 700px; margin: 30px auto;">
+
+
+            <h2>
+                📅 Academic Year Details
+            </h2>
+
+
+            <p style="color: #777;">
+                Enter the details of the academic year.
+            </p>
+
+
+            <form
+                method="POST"
+                style="margin-top: 25px;">
+
+
+                <!-- YEAR NAME -->
+
+                <div style="margin-bottom: 20px;">
+
+                    <label
+                        for="year_name"
+                        style="
+                            display: block;
+                            font-weight: 600;
+                            margin-bottom: 8px;
+                        ">
+
+                        Academic Year
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="year_name"
+                        name="year_name"
+                        placeholder="Example: 2027-28"
+                        required
+                        style="
+                            width: 100%;
+                            padding: 13px;
+                            border: 1px solid #d1d5db;
+                            border-radius: 10px;
+                            box-sizing: border-box;
+                        ">
+
+                </div>
+
+
+
+                <!-- START DATE -->
+
+                <div style="margin-bottom: 20px;">
+
+                    <label
+                        for="start_date"
+                        style="
+                            display: block;
+                            font-weight: 600;
+                            margin-bottom: 8px;
+                        ">
+
+                        Start Date
+
+                    </label>
+
+
+                    <input
+                        type="date"
+                        id="start_date"
+                        name="start_date"
+                        required
+                        style="
+                            width: 100%;
+                            padding: 13px;
+                            border: 1px solid #d1d5db;
+                            border-radius: 10px;
+                            box-sizing: border-box;
+                        ">
+
+                </div>
+
+
+
+                <!-- END DATE -->
+
+                <div style="margin-bottom: 25px;">
+
+                    <label
+                        for="end_date"
+                        style="
+                            display: block;
+                            font-weight: 600;
+                            margin-bottom: 8px;
+                        ">
+
+                        End Date
+
+                    </label>
+
+
+                    <input
+                        type="date"
+                        id="end_date"
+                        name="end_date"
+                        required
+                        style="
+                            width: 100%;
+                            padding: 13px;
+                            border: 1px solid #d1d5db;
+                            border-radius: 10px;
+                            box-sizing: border-box;
+                        ">
+
+                </div>
+
+
+
+                <!-- BUTTONS -->
+
+                <div style="
+                    display: flex;
+                    gap: 12px;
+                    flex-wrap: wrap;
+                ">
+
+
+                    <button
+                        type="submit"
+                        style="
+                            border: none;
+                            background: #6c63ff;
+                            color: white;
+                            padding: 13px 22px;
+                            border-radius: 10px;
+                            cursor: pointer;
+                            font-weight: 600;
+                        ">
+
+                        ➕ Create Academic Year
+
+                    </button>
+
+
+                    <a
+                        href="{{ url_for(
+                            'academic_year.academic_year_list'
+                        ) }}"
+                        style="
+                            text-decoration: none;
+                            background: #f3f4f6;
+                            color: #374151;
+                            padding: 13px 22px;
+                            border-radius: 10px;
+                            font-weight: 600;
+                        ">
+
+                        ← Cancel
+
+                    </a>
+
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+
+        <div class="dashboard-footer">
+
+            <span>
+                🧸 Smart Preschool Learning
+            </span>
+
+            <span>
+                Learn • Play • Grow 🌈
+            </span>
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+</body>
+
+</html>

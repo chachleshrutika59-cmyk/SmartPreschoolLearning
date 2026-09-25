@@ -2680,3 +2680,111 @@ body {
     }
 
 }
+
+/* =========================================
+   CLASS TEACHER ASSIGNMENT
+========================================= */
+
+.teacher-assigned-box {
+    background: #f4f1ff;
+    border: 1px solid #ddd6fe;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 15px;
+}
+
+.teacher-status {
+    margin-bottom: 12px;
+}
+
+.status-badge {
+    display: inline-block;
+    background: #dcfce7;
+    color: #166534;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.teacher-info h3 {
+    margin: 5px 0 8px;
+    color: #1f2937;
+    font-size: 22px;
+}
+
+.teacher-info p {
+    margin: 5px 0;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.teacher-not-assigned-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 15px;
+}
+
+.warning-icon {
+    font-size: 32px;
+}
+
+.teacher-not-assigned-box h3 {
+    margin: 0 0 5px;
+    color: #9a3412;
+}
+
+.teacher-not-assigned-box p {
+    margin: 0;
+    color: #7c2d12;
+}
+
+/* =========================================================
+   ADMIN SIDEBAR SCROLL FIX
+========================================================= */
+
+.admin-layout {
+    min-height: 100vh;
+}
+
+.sidebar {
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/* Sidebar scrollbar */
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+
+/* Main content should remain scrollable */
+
+.main-content {
+    min-height: 100vh;
+    overflow-y: auto;
+}
+

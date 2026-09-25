@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Classes - Smart Preschool</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #263238;
+        }
+
+        .header {
+            background: linear-gradient(
+                135deg,
+                #6c63ff,
+                #8e7dff
+            );
+
+            color: white;
+            padding: 25px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+        }
+
+        .header p {
+            margin-top: 6px;
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #6c63ff;
+            background: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 35px 40px;
+        }
+
+        .top-section {
+            margin-bottom: 25px;
+        }
+
+        .top-section h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .top-section p {
+            color: #667085;
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(260px, 1fr));
+
+            gap: 22px;
+        }
+
+        .class-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.08);
+
+            transition: 0.2s;
+        }
+
+        .class-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .class-number {
+            width: 45px;
+            height: 45px;
+
+            border-radius: 12px;
+
+            background: #eeeaff;
+            color: #6c63ff;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: bold;
+            font-size: 18px;
+
+            margin-bottom: 16px;
+        }
+
+        .class-card h3 {
+            font-size: 21px;
+            margin-bottom: 15px;
+        }
+
+        .info {
+            margin: 8px 0;
+            color: #667085;
+        }
+
+        .info strong {
+            color: #263238;
+        }
+
+        .teacher-assigned {
+            color: #16803c;
+            font-weight: bold;
+        }
+
+        .teacher-not-assigned {
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        .manage-btn {
+            display: block;
+
+            margin-top: 18px;
+
+            text-align: center;
+
+            text-decoration: none;
+
+            background: #6c63ff;
+            color: white;
+
+            padding: 11px;
+
+            border-radius: 9px;
+
+            font-weight: bold;
+        }
+
+        .manage-btn:hover {
+            background: #584ff0;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div>
+
+        <h1>Class Management</h1>
+
+        <p>
+            Academic Year: {{ academic_year_name }}
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('admin_dashboard') }}"
+        class="back-btn"
+    >
+        ← Dashboard
+    </a>
+
+</header>
+
+
+<main class="container">
+
+
+    <div class="top-section">
+
+        <h2>All Classes</h2>
+
+        <p>
+            Manage classes, students and class teachers.
+        </p>
+
+    </div>
+
+
+    <div class="class-grid">
+
+
+        {% for class_item in classes %}
+
+        <div class="class-card">
+
+
+            <div class="class-number">
+
+                {{ class_item[2] }}
+
+            </div>
+
+
+            <h3>
+
+                {{ class_item[1] }}
+
+            </h3>
+
+
+            <div class="info">
+
+                👧 Students:
+
+                <strong>
+
+                    {{ class_item[5] }}
+
+                </strong>
+
+            </div>
+
+
+            <div class="info">
+
+                👩‍🏫 Class Teacher:
+
+                {% if class_item[4] %}
+
+                    <span class="teacher-assigned">
+
+                        {{ class_item[4] }}
+
+                    </span>
+
+                {% else %}
+
+                    <span class="teacher-not-assigned">
+
+                        Not Assigned
+
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <a
+                href="{{ url_for(
+                    'classes.class_details',
+                    class_id=class_item[0]
+                ) }}"
+                class="manage-btn"
+            >
+
+                Manage Class
+
+            </a>
+
+
+        </div>
+
+        {% endfor %}
+
+
+    </div>
+
+
+</main>
+
+
+</body>
+
+</html>

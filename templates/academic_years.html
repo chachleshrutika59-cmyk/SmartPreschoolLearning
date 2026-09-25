@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Academic Years - Smart Preschool Learning</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        .academic-page {
+            padding: 30px;
+        }
+
+        .academic-header {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+        }
+
+        .academic-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .academic-header p {
+            margin-top: 8px;
+            color: #777;
+        }
+
+        .academic-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .academic-card h2 {
+            margin-top: 0;
+        }
+
+        .year-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 18px;
+        }
+
+        .year-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .year-name {
+            font-size: 30px;
+            font-weight: 700;
+            color: #6c5ce7;
+            margin-bottom: 10px;
+        }
+
+        .year-date {
+            color: #555;
+            font-size: 16px;
+        }
+
+        .year-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .update-btn {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: #6c5ce7;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .update-btn:hover {
+            background: #5848d8;
+        }
+
+        .current-badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 7px 14px;
+            border-radius: 20px;
+            background: #d9f8e8;
+            color: #16834b;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .set-current-btn {
+            margin-top: 15px;
+            padding: 7px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #f1f1f1;
+            color: #555;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .set-current-btn:hover {
+            background: #e5e5e5;
+        }
+
+        .add-year-btn {
+            display: inline-block;
+            padding: 10px 18px;
+            background: #6c5ce7;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #6c5ce7;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 700px) {
+
+            .year-top {
+                flex-direction: column;
+            }
+
+            .year-actions {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="admin-layout">
+
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div style="font-size: 38px;">
+                🧸
+            </div>
+
+            <h2>
+                Smart <span>Preschool</span>
+            </h2>
+
+            <small>
+                Learning Analytics
+            </small>
+
+        </div>
+
+
+        <ul class="sidebar-menu">
+
+            <li>
+                <a href="{{ url_for('admin_dashboard') }}">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('teacher.teacher_list') }}">
+                    👩‍🏫 Teachers
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/students">
+                    👧 Students
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    👨‍👩‍👧 Parents
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('classes.class_list') }}">
+                    🏫 Classes
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('academic_year.academic_year_list') }}"
+                   class="active">
+                    📅 Academic Years
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📚 Learning Activities
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📊 Analytics
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    💡 Recommendations
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    ⚙️ Settings
+                </a>
+            </li>
+
+        </ul>
+
+
+        <!-- LOGOUT -->
+
+        <div class="sidebar-logout">
+
+            <a href="{{ url_for('auth.logout') }}">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="main-content">
+
+        <div class="academic-page">
+
+
+            <!-- BACK -->
+
+            <a href="{{ url_for('admin_dashboard') }}"
+               class="back-btn">
+
+                ← Back to Dashboard
+
+            </a>
+
+
+            <!-- HEADER -->
+
+            <div class="academic-header">
+
+                <h1>
+                    📚 Academic Year Management
+                </h1>
+
+                <p>
+                    Create and manage academic years
+                    for student enrollment.
+                </p>
+
+            </div>
+
+
+            <!-- AVAILABLE YEARS -->
+
+            <div class="academic-card">
+
+                <h2>
+                    🗓️ Available Academic Years
+                </h2>
+
+
+                {% if academic_years %}
+
+                    {% for year in academic_years %}
+
+                    <div class="year-card">
+
+                        <div class="year-top">
+
+
+                            <!-- YEAR INFORMATION -->
+
+                            <div>
+
+                                <div class="year-name">
+
+                                    {{ year[1] }}
+
+                                </div>
+
+
+                                <div class="year-date">
+
+                                    📅
+                                    {{ year[2] }}
+                                    →
+                                    {{ year[3] }}
+
+                                </div>
+
+
+                                {% if year[4] %}
+
+                                    <div class="current-badge">
+
+                                        ✓ Current Academic Year
+
+                                    </div>
+
+                                {% else %}
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'academic_year.set_current_academic_year',
+                                            year_id=year[0]
+                                        ) }}"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            class="set-current-btn"
+                                        >
+
+                                            Set as Current
+
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- UPDATE BUTTON -->
+
+                            <div class="year-actions">
+
+                                <a
+                                    href="{{ url_for(
+                                        'academic_year.edit_academic_year',
+                                        year_id=year[0]
+                                    ) }}"
+                                    class="update-btn"
+                                >
+
+                                    ✏️ Update
+
+                                </a>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <p>
+                        No academic years have been created yet.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ADD YEAR -->
+
+            <div class="academic-card">
+
+                <a
+                    href="{{ url_for(
+                        'academic_year.add_academic_year'
+                    ) }}"
+                    class="add-year-btn"
+                >
+
+                    ➕ Add Academic Year
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

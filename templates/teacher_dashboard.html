@@ -15,15 +15,21 @@
 
 </head>
 
+
 <body>
 
+
 <div class="admin-layout">
+
 
     <!-- ======================================
          SIDEBAR
     ======================================= -->
 
     <aside class="sidebar">
+
+
+        <!-- LOGO -->
 
         <div class="sidebar-logo">
 
@@ -42,68 +48,134 @@
         </div>
 
 
+        <!-- MENU -->
+
         <ul class="sidebar-menu">
 
+
+            <!-- DASHBOARD -->
+
             <li>
-                <a href="/teacher/dashboard" class="active">
+
+                <a href="{{ url_for('teacher_dashboard') }}"
+                   class="active">
+
                     🏠 Dashboard
+
                 </a>
+
             </li>
 
+
+            <!-- MY STUDENTS -->
+
             <li>
-                <a href="#">
+
+                <a href="{{ url_for('teacher.teacher_students') }}">
+
                     👧 My Students
+
                 </a>
+
             </li>
 
+
+            <!-- LEARNING ACTIVITIES -->
+
             <li>
-                <a href="#">
+
+                <a href="{{ url_for('teacher.add_learning_activity') }}">
+
                     📚 Learning Activities
+
                 </a>
+
             </li>
 
+
+            <!-- ASSESSMENTS -->
+
             <li>
+
                 <a href="#">
+
                     📝 Assessments
+
                 </a>
+
             </li>
 
+
+            <!-- ATTENDANCE -->
+
             <li>
+
                 <a href="#">
+
                     📅 Attendance
+
                 </a>
+
             </li>
 
+
+            <!-- TEACHER REMARKS -->
+
             <li>
+
                 <a href="#">
+
                     💬 Teacher Remarks
+
                 </a>
+
             </li>
 
+
+            <!-- STUDENT PROGRESS -->
+
             <li>
+
                 <a href="#">
+
                     📊 Student Progress
+
                 </a>
+
             </li>
 
+
+            <!-- RECOMMENDATIONS -->
+
             <li>
+
                 <a href="#">
+
                     💡 Recommendations
+
                 </a>
+
             </li>
+
 
         </ul>
 
 
+        <!-- LOGOUT -->
+
         <div class="sidebar-logout">
 
-            <a href="/logout">
+            <a href="{{ url_for('auth.logout') }}">
+
                 🚪 Logout
+
             </a>
 
         </div>
 
+
     </aside>
+
 
 
     <!-- ======================================
@@ -113,44 +185,68 @@
     <main class="main-content">
 
 
-        <!-- TOP BAR -->
+        <!-- ======================================
+             TOP BAR
+        ======================================= -->
 
         <div class="topbar">
+
 
             <div>
 
                 <h1>
-                    👋 Welcome, {{ session["user_name"] }}!
+
+                    👋 Welcome, {{ teacher_name }}!
+
                 </h1>
 
+
                 <p>
-                    Manage your students and track their learning progress.
+
+                    Manage your students and track their
+                    learning progress.
+
                 </p>
 
             </div>
 
 
+
+            <!-- TEACHER PROFILE -->
+
             <div class="admin-profile">
 
+
                 <div class="profile-avatar">
+
                     👩‍🏫
+
                 </div>
+
 
                 <div>
 
                     <strong>
-                        {{ session["user_name"] }}
+
+                        {{ teacher_name }}
+
                     </strong>
 
+
                     <small>
+
                         Teacher
+
                     </small>
 
                 </div>
 
+
             </div>
 
+
         </div>
+
 
 
         <!-- ======================================
@@ -160,90 +256,163 @@
         <div class="dashboard-grid">
 
 
+            <!-- ==================================
+                 STUDENTS
+            =================================== -->
+
             <div class="stat-card blue">
 
+
                 <div class="stat-icon">
+
                     👧
+
                 </div>
+
 
                 <h3>
+
                     My Students
+
                 </h3>
 
+
                 <div class="number">
-                    0
+
+                    {{ student_count }}
+
                 </div>
 
+
                 <p>
+
                     Assigned students
+
                 </p>
+
 
             </div>
 
+
+
+            <!-- ==================================
+                 ACTIVITIES
+            =================================== -->
 
             <div class="stat-card pink">
 
+
                 <div class="stat-icon">
+
                     📚
+
                 </div>
+
 
                 <h3>
+
                     Activities
+
                 </h3>
 
+
                 <div class="number">
-                    0
+
+                    {{ activity_count }}
+
                 </div>
 
+
                 <p>
+
                     Learning records
+
                 </p>
+
 
             </div>
 
+
+
+            <!-- ==================================
+                 ATTENDANCE
+            =================================== -->
 
             <div class="stat-card yellow">
 
+
                 <div class="stat-icon">
+
                     📅
+
                 </div>
+
 
                 <h3>
+
                     Attendance
+
                 </h3>
 
+
                 <div class="number">
-                    0
+
+                    {{ attendance_count }}
+
                 </div>
 
+
                 <p>
+
                     Records this month
+
                 </p>
+
 
             </div>
 
+
+
+            <!-- ==================================
+                 ASSESSMENTS
+            =================================== -->
 
             <div class="stat-card green">
 
+
                 <div class="stat-icon">
+
                     📊
+
                 </div>
+
 
                 <h3>
+
                     Assessments
+
                 </h3>
 
+
                 <div class="number">
-                    0
+
+                    {{ assessment_count }}
+
                 </div>
 
+
                 <p>
+
                     Assessment records
+
                 </p>
+
 
             </div>
 
+
         </div>
+
 
 
         <!-- ======================================
@@ -252,156 +421,264 @@
 
         <div class="content-card">
 
+
             <div class="section-heading">
+
 
                 <div>
 
                     <h2>
+
                         🚀 Quick Actions
+
                     </h2>
 
+
                     <p>
+
                         Manage your classroom activities
+
                     </p>
 
                 </div>
 
+
             </div>
+
 
 
             <div class="quick-actions">
 
 
-                <a href="#"
+                <!-- ==================================
+                     MY STUDENTS
+                =================================== -->
+
+                <a href="{{ url_for('teacher.teacher_students') }}"
                    class="action-card action-blue">
 
+
                     <div class="action-icon">
+
                         👧
+
                     </div>
 
+
                     <h3>
+
                         My Students
+
                     </h3>
 
+
                     <p>
+
                         View assigned students
+
                     </p>
+
 
                 </a>
 
 
-                <a href="#"
+
+                <!-- ==================================
+                     ADD ACTIVITY
+                =================================== -->
+
+                <a href="{{ url_for('teacher.add_learning_activity') }}"
                    class="action-card action-pink">
 
+
                     <div class="action-icon">
+
                         📚
+
                     </div>
 
+
                     <h3>
+
                         Add Activity
+
                     </h3>
 
+
                     <p>
+
                         Record student learning
+
                     </p>
+
 
                 </a>
 
+
+
+                <!-- ==================================
+                     ATTENDANCE
+                =================================== -->
 
                 <a href="#"
                    class="action-card action-yellow">
 
+
                     <div class="action-icon">
+
                         📅
+
                     </div>
 
+
                     <h3>
+
                         Attendance
+
                     </h3>
 
+
                     <p>
+
                         Record student attendance
+
                     </p>
+
 
                 </a>
 
+
+
+                <!-- ==================================
+                     VIEW PROGRESS
+                =================================== -->
 
                 <a href="#"
                    class="action-card action-green">
 
+
                     <div class="action-icon">
+
                         📊
+
                     </div>
 
+
                     <h3>
+
                         View Progress
+
                     </h3>
 
+
                     <p>
+
                         Analyze student progress
+
                     </p>
+
 
                 </a>
 
+
             </div>
+
 
         </div>
 
 
+
         <!-- ======================================
-             INFORMATION
+             CLASSROOM INFORMATION
         ======================================= -->
 
         <div class="content-card">
 
+
             <h2>
+
                 🌟 Teacher Workspace
+
             </h2>
+
+
 
             <div class="system-message">
 
+
                 <div class="message-icon">
+
                     🎓
+
                 </div>
+
 
                 <div>
 
+
                     <h3>
+
                         Your classroom is ready!
+
                     </h3>
 
+
                     <p>
-                        Student records, learning activities,
-                        attendance, assessments and progress
-                        analytics will appear here as you use
-                        the system.
+
+                        You currently have
+
+                        <strong>
+                            {{ student_count }}
+                        </strong>
+
+                        assigned student(s).
+
+                        You can record learning activities
+                        and monitor their progress from this
+                        dashboard.
+
                     </p>
+
 
                 </div>
 
+
             </div>
+
 
         </div>
 
 
-        <!-- FOOTER -->
+
+        <!-- ======================================
+             FOOTER
+        ======================================= -->
 
         <div class="dashboard-footer">
 
-            <span>
-                🧸 Smart Preschool Learning
-            </span>
 
             <span>
-                Learn • Play • Grow 🌈
+
+                🧸 Smart Preschool Learning
+
             </span>
+
+
+            <span>
+
+                Learn • Play • Grow 🌈
+
+            </span>
+
 
         </div>
 
 
     </main>
 
+
 </div>
+
 
 </body>
 

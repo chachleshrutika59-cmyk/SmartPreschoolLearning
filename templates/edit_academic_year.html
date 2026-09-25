@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Update Academic Year - Smart Preschool Learning
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        .edit-page {
+            padding: 40px;
+            max-width: 750px;
+            margin: auto;
+        }
+
+        .edit-card {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.06);
+        }
+
+        .edit-card h1 {
+            margin-top: 0;
+            color: #222;
+        }
+
+        .edit-card p {
+            color: #777;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border: 1px solid #d6d6d6;
+            border-radius: 9px;
+            font-size: 15px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #6c5ce7;
+        }
+
+        .current-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .current-option input {
+            width: auto;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .save-btn {
+            border: none;
+            background: #6c5ce7;
+            color: white;
+            padding: 11px 20px;
+            border-radius: 9px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background: #5848d8;
+        }
+
+        .cancel-btn {
+            background: #eeeeee;
+            color: #444;
+            padding: 11px 20px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .cancel-btn:hover {
+            background: #e0e0e0;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="admin-layout">
+
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <div style="font-size: 38px;">
+                🧸
+            </div>
+
+            <h2>
+                Smart <span>Preschool</span>
+            </h2>
+
+            <small>
+                Learning Analytics
+            </small>
+
+        </div>
+
+
+        <ul class="sidebar-menu">
+
+            <li>
+                <a href="{{ url_for('admin_dashboard') }}">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('teacher.teacher_list') }}">
+                    👩‍🏫 Teachers
+                </a>
+            </li>
+
+            <li>
+                <a href="/admin/students">
+                    👧 Students
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    👨‍👩‍👧 Parents
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('classes.class_list') }}">
+                    🏫 Classes
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('academic_year.academic_year_list') }}"
+                   class="active">
+                    📅 Academic Years
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📚 Learning Activities
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📊 Analytics
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    💡 Recommendations
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    ⚙️ Settings
+                </a>
+            </li>
+
+        </ul>
+
+
+        <!-- LOGOUT -->
+
+        <div class="sidebar-logout">
+
+            <a href="{{ url_for('auth.logout') }}">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="main-content">
+
+        <div class="edit-page">
+
+            <div class="edit-card">
+
+                <h1>
+                    ✏️ Update Academic Year
+                </h1>
+
+                <p>
+                    Correct or update the academic year
+                    information below.
+                </p>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'academic_year.edit_academic_year',
+                        year_id=academic_year[0]
+                    ) }}"
+                >
+
+
+                    <!-- ACADEMIC YEAR -->
+
+                    <div class="form-group">
+
+                        <label>
+                            Academic Year
+                        </label>
+
+                        <input
+                            type="text"
+                            name="year_name"
+                            value="{{ academic_year[1] }}"
+                            placeholder="Example: 2026-27"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- START DATE -->
+
+                    <div class="form-group">
+
+                        <label>
+                            Start Date
+                        </label>
+
+                        <input
+                            type="date"
+                            name="start_date"
+                            value="{{ academic_year[2] }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- END DATE -->
+
+                    <div class="form-group">
+
+                        <label>
+                            End Date
+                        </label>
+
+                        <input
+                            type="date"
+                            name="end_date"
+                            value="{{ academic_year[3] }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- CURRENT YEAR -->
+
+                    <div class="current-option">
+
+                        <input
+                            type="checkbox"
+                            name="is_current"
+                            id="is_current"
+                            {% if academic_year[4] %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <label for="is_current">
+
+                            Set as Current Academic Year
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- BUTTONS -->
+
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            class="save-btn"
+                        >
+
+                            💾 Save Changes
+
+                        </button>
+
+
+                        <a
+                            href="{{ url_for(
+                                'academic_year.academic_year_list'
+                            ) }}"
+                            class="cancel-btn"
+                        >
+
+                            Cancel
+
+                        </a>
+
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>
