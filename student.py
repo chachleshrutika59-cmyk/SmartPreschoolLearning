@@ -6,6 +6,10 @@ import bcrypt
 student = Blueprint("student", __name__)
 
 
+# =========================================================
+# ADMIN - STUDENT LIST
+# =========================================================
+
 @student.route("/admin/students")
 def student_list():
 
@@ -18,6 +22,7 @@ def student_list():
     conn = get_connection()
 
     try:
+
         with conn.cursor() as cur:
 
             cur.execute(
@@ -55,6 +60,7 @@ def student_list():
             students = cur.fetchall()
 
     finally:
+
         conn.close()
 
     return render_template(
@@ -63,7 +69,14 @@ def student_list():
     )
 
 
-@student.route("/admin/students/add", methods=["GET", "POST"])
+# =========================================================
+# ADMIN - ADD STUDENT
+# =========================================================
+
+@student.route(
+    "/admin/students/add",
+    methods=["GET", "POST"]
+)
 def add_student():
 
     if "user_id" not in session:
@@ -71,6 +84,10 @@ def add_student():
 
     if session.get("role") != "ADMIN":
         return "Access Denied", 403
+
+    # =====================================================
+    # GET CLASSES AND ACADEMIC YEARS
+    # =====================================================
 
     conn = get_connection()
 
@@ -80,7 +97,9 @@ def add_student():
 
             cur.execute(
                 """
-                SELECT id, class_name
+                SELECT
+                    id,
+                    class_name
                 FROM classes
                 ORDER BY class_order
                 """
@@ -90,7 +109,9 @@ def add_student():
 
             cur.execute(
                 """
-                SELECT id, year_name
+                SELECT
+                    id,
+                    year_name
                 FROM academic_years
                 ORDER BY start_date DESC
                 """
@@ -99,43 +120,104 @@ def add_student():
             academic_years = cur.fetchall()
 
     finally:
+
         conn.close()
+
+    # =====================================================
+    # HANDLE FORM SUBMISSION
+    # =====================================================
 
     if request.method == "POST":
 
+        # -------------------------------------------------
+        # BASIC STUDENT INFORMATION
+        # -------------------------------------------------
+
         name = request.form["name"].strip()
+
         email = request.form["email"].strip().lower()
+
         password = request.form["password"]
 
-        admission_number = request.form["admission_number"].strip()
-        date_of_birth = request.form.get("date_of_birth") or None
-        gender = request.form.get("gender") or None
+        date_of_birth = (
+            request.form.get("date_of_birth")
+            or None
+        )
 
-        parent_name = request.form.get("parent_name", "").strip()
-        parent_mobile = request.form.get("parent_mobile", "").strip()
-        parent_email = request.form.get("parent_email", "").strip().lower()
+        gender = (
+            request.form.get("gender")
+            or None
+        )
 
-        address = request.form.get("address", "").strip()
+        # -------------------------------------------------
+        # PARENT INFORMATION
+        # -------------------------------------------------
+
+        parent_name = request.form.get(
+            "parent_name",
+            ""
+        ).strip()
+
+        parent_mobile = request.form.get(
+            "parent_mobile",
+            ""
+        ).strip()
+
+        parent_email = request.form.get(
+            "parent_email",
+            ""
+        ).strip().lower()
+
+        address = request.form.get(
+            "address",
+            ""
+        ).strip()
+
+        # -------------------------------------------------
+        # CLASS / ACADEMIC YEAR
+        # -------------------------------------------------
 
         class_id = request.form.get("class_id")
-        academic_year_id = request.form.get("academic_year_id")
+
+        academic_year_id = request.form.get(
+            "academic_year_id"
+        )
+
+        # =================================================
+        # VALIDATION
+        # =================================================
 
         if not name or not email or not password:
-            return "Name, email and password are required."
 
-        if not admission_number:
-            return "Admission number is required."
+            return (
+                "Name, email and password are required."
+            )
 
         if not class_id or not academic_year_id:
-            return "Class and academic year are required."
+
+            return (
+                "Class and academic year are required."
+            )
 
         if len(password) < 6:
-            return "Password must contain at least 6 characters."
+
+            return (
+                "Password must contain at least "
+                "6 characters."
+            )
+
+        # =================================================
+        # HASH PASSWORD
+        # =================================================
 
         password_hash = bcrypt.hashpw(
             password.encode("utf-8"),
             bcrypt.gensalt()
         ).decode("utf-8")
+
+        # =================================================
+        # DATABASE TRANSACTION
+        # =================================================
 
         conn = get_connection()
 
@@ -143,7 +225,10 @@ def add_student():
 
             with conn.cursor() as cur:
 
-                # Check duplicate email
+                # =========================================
+                # CHECK DUPLICATE EMAIL
+                # =========================================
+
                 cur.execute(
                     """
                     SELECT id
@@ -154,30 +239,79 @@ def add_student():
                 )
 
                 if cur.fetchone():
-                    conn.rollback()
-                    return "A user with this email already exists."
 
-                # Check duplicate admission number
+                    conn.rollback()
+
+                    return (
+                        "A user with this email "
+                        "already exists."
+                    )
+
+                # =========================================
+                # GENERATE NEXT ADMISSION NUMBER
+                # =========================================
+                #
+                # Example:
+                #
+                # STU001
+                # STU002
+                # STU003
+                #
+                # Next:
+                #
+                # STU004
+                #
+                # =========================================
+
                 cur.execute(
                     """
-                    SELECT id
+                    SELECT COALESCE(
+                        MAX(
+                            CAST(
+                                SUBSTRING(
+                                    admission_number
+                                    FROM 4
+                                ) AS INTEGER
+                            )
+                        ),
+                        0
+                    )
                     FROM students
-                    WHERE admission_number = %s
-                    """,
-                    (admission_number,)
+                    WHERE admission_number
+                          LIKE 'STU%'
+                    """
                 )
 
-                if cur.fetchone():
-                    conn.rollback()
-                    return "This admission number already exists."
+                last_number = cur.fetchone()[0]
 
-                # Create login account
+                next_number = last_number + 1
+
+                admission_number = (
+                    f"STU{next_number:03d}"
+                )
+
+                # =========================================
+                # CREATE LOGIN ACCOUNT
+                # =========================================
+
                 cur.execute(
                     """
                     INSERT INTO users
-                        (name, email, password_hash, role, is_active)
+                        (
+                            name,
+                            email,
+                            password_hash,
+                            role,
+                            is_active
+                        )
                     VALUES
-                        (%s, %s, %s, 'STUDENT', TRUE)
+                        (
+                            %s,
+                            %s,
+                            %s,
+                            'STUDENT',
+                            TRUE
+                        )
                     RETURNING id
                     """,
                     (
@@ -189,7 +323,10 @@ def add_student():
 
                 user_id = cur.fetchone()[0]
 
-                # Create student profile
+                # =========================================
+                # CREATE STUDENT PROFILE
+                # =========================================
+
                 cur.execute(
                     """
                     INSERT INTO students
@@ -205,7 +342,17 @@ def add_student():
                             address
                         )
                     VALUES
-                        (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        (
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s
+                        )
                     RETURNING id
                     """,
                     (
@@ -223,7 +370,10 @@ def add_student():
 
                 student_id = cur.fetchone()[0]
 
-                # Create enrollment
+                # =========================================
+                # CREATE ENROLLMENT
+                # =========================================
+
                 cur.execute(
                     """
                     INSERT INTO student_enrollments
@@ -234,7 +384,12 @@ def add_student():
                             status
                         )
                     VALUES
-                        (%s, %s, %s, 'ACTIVE')
+                        (
+                            %s,
+                            %s,
+                            %s,
+                            'ACTIVE'
+                        )
                     """,
                     (
                         student_id,
@@ -243,7 +398,10 @@ def add_student():
                     )
                 )
 
-                # Create parent contact record
+                # =========================================
+                # CREATE PARENT CONTACT RECORD
+                # =========================================
+
                 if parent_name:
 
                     cur.execute(
@@ -258,7 +416,14 @@ def add_student():
                                 address
                             )
                         VALUES
-                            (%s, %s, %s, %s, %s, %s)
+                            (
+                                %s,
+                                %s,
+                                %s,
+                                %s,
+                                %s,
+                                %s
+                            )
                         """,
                         (
                             student_id,
@@ -270,51 +435,91 @@ def add_student():
                         )
                     )
 
+            # =============================================
+            # COMMIT TRANSACTION
+            # =============================================
+
             conn.commit()
 
         except Exception as e:
 
             conn.rollback()
 
-            return f"Error creating student: {e}"
+            return (
+                f"Error creating student: {e}"
+            )
 
         finally:
+
             conn.close()
 
-        return redirect(url_for("student.student_list"))
+        # =============================================
+        # STUDENT CREATED SUCCESSFULLY
+        # =============================================
+
+        return redirect(
+            url_for("student.student_list")
+        )
+
+    # =====================================================
+    # SHOW ADD STUDENT PAGE
+    # =====================================================
 
     return render_template(
         "add_student.html",
         classes=classes,
         academic_years=academic_years
     )
+
+
 # =========================================================
-# ACTIVATE / DEACTIVATE STUDENT
+# ADMIN - ACTIVATE / DEACTIVATE STUDENT
 # =========================================================
 
-@student.route("/admin/students/toggle/<int:student_id>", methods=["POST"])
+@student.route(
+    "/admin/students/toggle/<int:student_id>",
+    methods=["POST"]
+)
 def toggle_student(student_id):
 
-    # Check login
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
+    # -----------------------------------------------------
+    # CHECK LOGIN
+    # -----------------------------------------------------
 
-    # Only ADMIN can change student status
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("auth.login")
+        )
+
+    # -----------------------------------------------------
+    # ONLY ADMIN
+    # -----------------------------------------------------
+
     if session.get("role") != "ADMIN":
+
         return "Access Denied", 403
 
     conn = get_connection()
 
     try:
+
         with conn.cursor() as cur:
 
-            # Get student's user account and current status
+            # =============================================
+            # GET STUDENT USER ACCOUNT
+            # =============================================
+
             cur.execute(
                 """
-                SELECT u.id, u.is_active
+                SELECT
+                    u.id,
+                    u.is_active
                 FROM students s
+
                 JOIN users u
                     ON s.user_id = u.id
+
                 WHERE s.id = %s
                 """,
                 (student_id,)
@@ -323,11 +528,15 @@ def toggle_student(student_id):
             student_data = cur.fetchone()
 
             if not student_data:
+
                 return "Student not found", 404
 
             user_id, current_status = student_data
 
-            # Toggle status
+            # =============================================
+            # TOGGLE STATUS
+            # =============================================
+
             new_status = not current_status
 
             cur.execute(
@@ -336,7 +545,10 @@ def toggle_student(student_id):
                 SET is_active = %s
                 WHERE id = %s
                 """,
-                (new_status, user_id)
+                (
+                    new_status,
+                    user_id
+                )
             )
 
         conn.commit()
@@ -345,10 +557,14 @@ def toggle_student(student_id):
 
         conn.rollback()
 
-        return f"Error updating student status: {e}"
+        return (
+            f"Error updating student status: {e}"
+        )
 
     finally:
 
         conn.close()
 
-    return redirect(url_for("student.student_list"))
+    return redirect(
+        url_for("student.student_list")
+    )

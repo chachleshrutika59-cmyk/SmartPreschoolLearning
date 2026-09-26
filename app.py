@@ -143,6 +143,10 @@ def admin_dashboard():
 # TEACHER DASHBOARD
 # =========================================================
 
+# =========================================================
+# TEACHER DASHBOARD
+# =========================================================
+
 @app.route("/teacher/dashboard")
 def teacher_dashboard():
 
@@ -151,17 +155,13 @@ def teacher_dashboard():
     # -----------------------------------------------------
 
     if "user_id" not in session:
-
-        return redirect(
-            url_for("auth.login")
-        )
+        return redirect(url_for("auth.login"))
 
     # -----------------------------------------------------
-    # ONLY TEACHER
+    # CHECK ROLE
     # -----------------------------------------------------
 
     if session.get("role") != "TEACHER":
-
         return "Access Denied", 403
 
     teacher_user_id = session["user_id"]
@@ -173,14 +173,16 @@ def teacher_dashboard():
         with conn.cursor() as cur:
 
             # =================================================
-            # GET TEACHER INFORMATION
+            # 1. GET TEACHER INFORMATION
             # =================================================
 
             cur.execute(
                 """
                 SELECT
                     id,
-                    teacher_name
+                    teacher_name,
+                    email,
+                    mobile
                 FROM teachers
                 WHERE user_id = %s
                 """,
@@ -190,91 +192,50 @@ def teacher_dashboard():
             teacher_data = cur.fetchone()
 
             if not teacher_data:
-
-                return (
-                    "Teacher profile not found.",
-                    404
-                )
+                return "Teacher profile not found.", 404
 
             teacher_id = teacher_data[0]
-
             teacher_name = teacher_data[1]
+            teacher_email = teacher_data[2]
+            teacher_mobile = teacher_data[3]
 
 
             # =================================================
-            # GET CURRENT ACADEMIC YEAR
-            # =================================================
-
-            cur.execute(
-                """
-                SELECT
-                    id,
-                    year_name
-                FROM academic_years
-                WHERE is_current = TRUE
-                LIMIT 1
-                """
-            )
-
-            current_year = cur.fetchone()
-
-            if not current_year:
-
-                return (
-                    "Current academic year "
-                    "not found.",
-                    404
-                )
-
-            academic_year_id = current_year[0]
-
-            academic_year_name = current_year[1]
-
-
-            # =================================================
-            # COUNT ASSIGNED STUDENTS
+            # 2. COUNT STUDENTS FROM ASSIGNED CLASSES
             # =================================================
             #
             # NEW RELATIONSHIP:
             #
-            # Teacher
-            #    ↓
-            # Class Teacher Assignment
-            #    ↓
-            # Class
-            #    ↓
-            # Student Enrollment
-            #    ↓
-            # Student
+            # class_teacher_assignments
+            #          ↓
+            #       classes
+            #          ↓
+            # student_enrollments
+            #          ↓
+            #      students
             #
             # =================================================
 
             cur.execute(
                 """
                 SELECT COUNT(DISTINCT se.student_id)
+                FROM class_teacher_assignments cta
 
-                FROM student_enrollments se
-
-                JOIN class_teacher_assignments cta
+                JOIN student_enrollments se
                     ON cta.class_id = se.class_id
-                    AND cta.academic_year_id =
-                        se.academic_year_id
+                   AND cta.academic_year_id = se.academic_year_id
 
                 WHERE cta.teacher_id = %s
-                  AND se.academic_year_id = %s
                   AND se.status = 'ACTIVE'
                 """,
-                (
-                    teacher_id,
-                    academic_year_id
-                )
+                (teacher_id,)
             )
 
             student_count = cur.fetchone()[0]
 
 
             # =================================================
-            # COUNT LEARNING ACTIVITIES
+            # 3. COUNT LEARNING ACTIVITIES
             # =================================================
 
             cur.execute(
@@ -290,7 +251,7 @@ def teacher_dashboard():
 
 
             # =================================================
-            # COUNT ATTENDANCE THIS MONTH
+            # 4. COUNT ATTENDANCE THIS MONTH
             # =================================================
 
             cur.execute(
@@ -315,7 +276,7 @@ def teacher_dashboard():
 
 
             # =================================================
-            # COUNT ASSESSMENTS
+            # 5. COUNT ASSESSMENTS
             # =================================================
 
             cur.execute(
@@ -331,23 +292,45 @@ def teacher_dashboard():
 
 
             # =================================================
-            # COUNT ASSIGNED CLASSES
+            # 6. GET TEACHER'S ASSIGNED CLASSES
             # =================================================
 
             cur.execute(
                 """
-                SELECT COUNT(DISTINCT cta.class_id)
+                SELECT
+                    c.id,
+                    c.class_name,
+                    c.class_order,
+                    ay.year_name,
+                    COUNT(DISTINCT se.student_id) AS student_count
                 FROM class_teacher_assignments cta
+
+                JOIN classes c
+                    ON cta.class_id = c.id
+
+                JOIN academic_years ay
+                    ON cta.academic_year_id = ay.id
+
+                LEFT JOIN student_enrollments se
+                    ON c.id = se.class_id
+                   AND cta.academic_year_id = se.academic_year_id
+                   AND se.status = 'ACTIVE'
+
                 WHERE cta.teacher_id = %s
-                  AND cta.academic_year_id = %s
+
+                GROUP BY
+                    c.id,
+                    c.class_name,
+                    c.class_order,
+                    ay.year_name
+
+                ORDER BY c.class_order
                 """,
-                (
-                    teacher_id,
-                    academic_year_id
-                )
+                (teacher_id,)
             )
 
-            class_count = cur.fetchone()[0]
+            assigned_classes = cur.fetchall()
+
 
     finally:
 
@@ -361,21 +344,20 @@ def teacher_dashboard():
     return render_template(
         "teacher_dashboard.html",
 
+        # Teacher information
         teacher_name=teacher_name,
+        teacher_email=teacher_email,
+        teacher_mobile=teacher_mobile,
 
+        # Statistics
         student_count=student_count,
-
         activity_count=activity_count,
-
         attendance_count=attendance_count,
-
         assessment_count=assessment_count,
 
-        class_count=class_count,
-
-        academic_year_name=academic_year_name
+        # Assigned classes
+        assigned_classes=assigned_classes
     )
-
 
 # =========================================================
 # STUDENT DASHBOARD
