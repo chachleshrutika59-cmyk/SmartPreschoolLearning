@@ -352,7 +352,8 @@ def teacher_students():
 
             cur.execute(
                 """
-                SELECT id
+                SELECT
+                    id
                 FROM teachers
                 WHERE user_id = %s
                 """,
@@ -413,7 +414,8 @@ def teacher_students():
                     s.admission_number,
                     s.gender,
                     c.class_name,
-                    ay.year_name
+                    ay.year_name,
+                    c.class_order
                 FROM students s
 
                 JOIN student_enrollments se
@@ -456,6 +458,401 @@ def teacher_students():
     )
 
 
+
+
+# =========================================================
+# TEACHER - VIEW STUDENTS OF PARTICULAR CLASS
+# =========================================================
+
+@teacher.route("/teacher/class/<int:class_id>/students")
+def teacher_class_students(class_id):
+
+    # -----------------------------------------------------
+    # CHECK LOGIN
+    # -----------------------------------------------------
+
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    # -----------------------------------------------------
+    # ONLY TEACHER
+    # -----------------------------------------------------
+
+    if session.get("role") != "TEACHER":
+        return "Access Denied", 403
+
+    teacher_user_id = session["user_id"]
+
+    conn = get_connection()
+
+    try:
+
+        with conn.cursor() as cur:
+
+            # =================================================
+            # GET TEACHER ID
+            # =================================================
+
+            cur.execute(
+                """
+                SELECT
+                    id
+                FROM teachers
+                WHERE user_id = %s
+                """,
+                (teacher_user_id,)
+            )
+
+            teacher_data = cur.fetchone()
+
+            if not teacher_data:
+                return "Teacher profile not found.", 404
+
+            teacher_id = teacher_data[0]
+
+            # =================================================
+            # GET CURRENT ACADEMIC YEAR
+            # =================================================
+
+            cur.execute(
+                """
+                SELECT
+                    id,
+                    year_name
+                FROM academic_years
+                WHERE is_current = TRUE
+                LIMIT 1
+                """
+            )
+
+            current_year = cur.fetchone()
+
+            if not current_year:
+                return "Current academic year not found.", 404
+
+            academic_year_id = current_year[0]
+            academic_year_name = current_year[1]
+
+            # =================================================
+            # CHECK THAT TEACHER IS CLASS TEACHER
+            # =================================================
+
+            cur.execute(
+                """
+                SELECT
+                    c.id,
+                    c.class_name,
+                    c.class_order
+                FROM class_teacher_assignments cta
+
+                JOIN classes c
+                    ON cta.class_id = c.id
+
+                WHERE cta.teacher_id = %s
+                  AND cta.class_id = %s
+                  AND cta.academic_year_id = %s
+                """,
+                (
+                    teacher_id,
+                    class_id,
+                    academic_year_id
+                )
+            )
+
+            class_data = cur.fetchone()
+
+            if not class_data:
+                return "You are not assigned as class teacher for this class.", 403
+
+            class_name = class_data[1]
+
+            # =================================================
+            # GET ONLY STUDENTS OF THIS CLASS
+            # =================================================
+
+            cur.execute(
+                """
+                SELECT
+                    s.id,
+                    s.student_name,
+                    s.admission_number,
+                    s.gender,
+                    c.class_name,
+                    ay.year_name
+                FROM students s
+
+                JOIN student_enrollments se
+                    ON s.id = se.student_id
+
+                JOIN classes c
+                    ON se.class_id = c.id
+
+                JOIN academic_years ay
+                    ON se.academic_year_id = ay.id
+
+                WHERE se.class_id = %s
+                  AND se.academic_year_id = %s
+                  AND se.status = 'ACTIVE'
+
+                ORDER BY
+                    s.student_name
+                """,
+                (
+                    class_id,
+                    academic_year_id
+                )
+            )
+
+            students = cur.fetchall()
+
+    finally:
+
+        conn.close()
+
+    return render_template(
+        "teacher_students.html",
+        students=students,
+        academic_year_name=academic_year_name,
+        selected_class_name=class_name
+    )
+
+
+
+# =========================================================
+# TEACHER - VIEW STUDENT PROFILE
+# =========================================================
+
+@teacher.route("/teacher/student/<int:student_id>")
+def student_profile(student_id):
+
+    # -----------------------------------------------------
+    # CHECK LOGIN
+    # -----------------------------------------------------
+
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    # -----------------------------------------------------
+    # ONLY TEACHER
+    # -----------------------------------------------------
+
+    if session.get("role") != "TEACHER":
+        return "Access Denied", 403
+
+    teacher_user_id = session["user_id"]
+
+    conn = get_connection()
+
+    try:
+
+        with conn.cursor() as cur:
+
+            # =================================================
+            # GET TEACHER ID
+            # =================================================
+
+            cur.execute(
+                """
+                SELECT
+                    id
+                FROM teachers
+                WHERE user_id = %s
+                """,
+                (teacher_user_id,)
+            )
+
+            teacher_data = cur.fetchone()
+
+            if not teacher_data:
+                return "Teacher profile not found.", 404
+
+            teacher_id = teacher_data[0]
+
+            # =================================================
+            # GET CURRENT ACADEMIC YEAR
+            # =================================================
+
+            cur.execute(
+                """
+                SELECT
+                    id,
+                    year_name
+                FROM academic_years
+                WHERE is_current = TRUE
+                LIMIT 1
+                """
+            )
+
+            current_year = cur.fetchone()
+
+            if not current_year:
+                return "Current academic year not found.", 404
+
+            academic_year_id = current_year[0]
+            academic_year_name = current_year[1]
+
+            # =================================================
+            # GET STUDENT PROFILE
+            # =================================================
+            #
+            # IMPORTANT:
+            # The student must belong to a class where
+            # the logged-in teacher is the class teacher.
+            #
+            # =================================================
+
+            cur.execute(
+                """
+                SELECT
+                    s.id,
+                    s.student_name,
+                    s.admission_number,
+                    s.date_of_birth,
+                    s.gender,
+                    s.parent_name,
+                    s.parent_mobile,
+                    s.parent_email,
+                    s.address,
+                    c.id AS class_id,
+                    c.class_name,
+                    ay.year_name,
+                    se.enrollment_date,
+                    se.status
+                FROM students s
+
+                JOIN student_enrollments se
+                    ON s.id = se.student_id
+
+                JOIN classes c
+                    ON se.class_id = c.id
+
+                JOIN academic_years ay
+                    ON se.academic_year_id = ay.id
+
+                JOIN class_teacher_assignments cta
+                    ON cta.class_id = se.class_id
+                    AND cta.academic_year_id = se.academic_year_id
+
+                WHERE s.id = %s
+                  AND cta.teacher_id = %s
+                  AND se.academic_year_id = %s
+                  AND se.status = 'ACTIVE'
+                LIMIT 1
+                """,
+                (
+                    student_id,
+                    teacher_id,
+                    academic_year_id
+                )
+            )
+
+            student = cur.fetchone()
+
+            if not student:
+                return (
+                    "Student not found or "
+                    "student is not assigned "
+                    "to your class.",
+                    403
+                )
+
+            # =================================================
+            # GET LEARNING ACTIVITIES
+            # =================================================
+
+            cur.execute(
+                """
+                SELECT
+                    id,
+                    activity_name,
+                    activity_date,
+                    score,
+                    max_score,
+                    attempts,
+                    time_taken_seconds,
+                    remarks
+                FROM learning_activities
+                WHERE student_id = %s
+                  AND enrollment_id = (
+                      SELECT se.id
+                      FROM student_enrollments se
+                      WHERE se.student_id = %s
+                        AND se.academic_year_id = %s
+                        AND se.status = 'ACTIVE'
+                      LIMIT 1
+                  )
+                ORDER BY
+                    activity_date DESC,
+                    id DESC
+                """,
+                (
+                    student_id,
+                    student_id,
+                    academic_year_id
+                )
+            )
+
+            activities = cur.fetchall()
+
+            # =================================================
+            # PERFORMANCE SUMMARY
+            # =================================================
+
+            cur.execute(
+                """
+                SELECT
+                    COUNT(*) AS total_activities,
+                    COALESCE(
+                        ROUND(
+                            AVG(
+                                CASE
+                                    WHEN max_score > 0
+                                    THEN (score / max_score) * 100
+                                    ELSE NULL
+                                END
+                            ),
+                            2
+                        ),
+                        0
+                    ) AS average_score,
+                    COALESCE(
+                        SUM(attempts),
+                        0
+                    ) AS total_attempts
+                FROM learning_activities
+                WHERE student_id = %s
+                  AND enrollment_id = (
+                      SELECT se.id
+                      FROM student_enrollments se
+                      WHERE se.student_id = %s
+                        AND se.academic_year_id = %s
+                        AND se.status = 'ACTIVE'
+                      LIMIT 1
+                  )
+                """,
+                (
+                    student_id,
+                    student_id,
+                    academic_year_id
+                )
+            )
+
+            performance = cur.fetchone()
+
+    finally:
+
+        conn.close()
+
+    return render_template(
+        "student_profile.html",
+        student=student,
+        activities=activities,
+        performance=performance,
+        academic_year_name=academic_year_name
+    )
+
+
+
 # =========================================================
 # TEACHER - ADD LEARNING ACTIVITY
 # =========================================================
@@ -494,7 +891,8 @@ def add_learning_activity():
 
             cur.execute(
                 """
-                SELECT id
+                SELECT
+                    id
                 FROM teachers
                 WHERE user_id = %s
                 """,
@@ -542,7 +940,8 @@ def add_learning_activity():
                     s.student_name,
                     s.admission_number,
                     se.id AS enrollment_id,
-                    c.class_name
+                    c.class_name,
+                    c.class_order
                 FROM students s
 
                 JOIN student_enrollments se

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ student[1] }} - Student Profile
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f6f9fd;
+            color: #344054;
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        /* =================================================
+           HEADER
+        ================================================= */
+
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 18px;
+            border: 1px solid #e7edf5;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+            color: #2878d7;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #7c8798;
+        }
+
+        /* =================================================
+           PROFILE
+        ================================================= */
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 22px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            border: 1px solid #e7edf5;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.05);
+        }
+
+        .profile-card {
+            text-align: center;
+        }
+
+        .student-avatar {
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            background: #fff0f5;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 52px;
+
+            margin: 0 auto 18px;
+        }
+
+        .student-name {
+            font-size: 23px;
+            font-weight: bold;
+            color: #253858;
+        }
+
+        .admission {
+            margin-top: 8px;
+            color: #2878d7;
+            font-weight: bold;
+        }
+
+        /* =================================================
+           DETAILS
+        ================================================= */
+
+        .card-title {
+            margin: 0 0 20px;
+            color: #253858;
+            font-size: 20px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .detail-box {
+            background: #f8fafc;
+            padding: 14px;
+            border-radius: 10px;
+        }
+
+        .detail-label {
+            display: block;
+            font-size: 12px;
+            color: #8992a3;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #344054;
+        }
+
+        /* =================================================
+           STATISTICS
+        ================================================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid #e7edf5;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.04);
+        }
+
+        .stat-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2878d7;
+        }
+
+        .stat-label {
+            color: #8992a3;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        /* =================================================
+           ACTIVITIES
+        ================================================= */
+
+        .activity-table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 14px;
+            background: #f5f8fc;
+            color: #667085;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 14px;
+            border-top: 1px solid #edf0f5;
+            font-size: 14px;
+        }
+
+        .score {
+            font-weight: bold;
+            color: #2878d7;
+        }
+
+        .remarks {
+            color: #667085;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 35px;
+            color: #8992a3;
+        }
+
+        /* =================================================
+           BACK BUTTON
+        ================================================= */
+
+        .back {
+            margin-top: 25px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            text-decoration: none;
+            background: #fff0f5;
+            color: #e84d7a;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: #e84d7a;
+            color: white;
+        }
+
+        /* =================================================
+           RESPONSIVE
+        ================================================= */
+
+        @media (max-width: 850px) {
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .page {
+                padding: 15px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <div class="header">
+
+        <h1>
+            👧 Student Profile
+        </h1>
+
+        <p>
+            View student information and learning performance.
+        </p>
+
+    </div>
+
+
+    <!-- =================================================
+         PROFILE INFORMATION
+    ================================================== -->
+
+    <div class="profile-grid">
+
+
+        <!-- BASIC PROFILE -->
+
+        <div class="card profile-card">
+
+            <div class="student-avatar">
+
+                {% if student[4] == "Male" %}
+                    👦
+                {% else %}
+                    👧
+                {% endif %}
+
+            </div>
+
+            <div class="student-name">
+                {{ student[1] }}
+            </div>
+
+            <div class="admission">
+                Admission No: {{ student[2] }}
+            </div>
+
+        </div>
+
+
+        <!-- DETAILS -->
+
+        <div class="card">
+
+            <h2 class="card-title">
+                📋 Student Information
+            </h2>
+
+            <div class="details-grid">
+
+                <div class="detail-box">
+
+                    <span class="detail-label">
+                        Class
+                    </span>
+
+                    <span class="detail-value">
+                        {{ student[10] }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <span class="detail-label">
+                        Academic Year
+                    </span>
+
+                    <span class="detail-value">
+                        {{ student[11] }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <span class="detail-label">
+                        Gender
+                    </span>
+
+                    <span class="detail-value">
+                        {{ student[4] or "Not specified" }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <span class="detail-label">
+                        Date of Birth
+                    </span>
+
+                    <span class="detail-value">
+                        {{ student[3] or "Not specified" }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <span class="detail-label">
+                        Parent Name
+                    </span>
+
+                    <span class="detail-value">
+                        {{ student[5] or "Not specified" }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <span class="detail-label">
+                        Parent Mobile
+                    </span>
+
+                    <span class="detail-value">
+                        {{ student[6] or "Not specified" }}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         PERFORMANCE SUMMARY
+    ================================================== -->
+
+    <div class="stats">
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📚
+            </div>
+
+            <div class="stat-value">
+                {{ performance[0] }}
+            </div>
+
+            <div class="stat-label">
+                Learning Activities
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📊
+            </div>
+
+            <div class="stat-value">
+                {{ performance[1] }}%
+            </div>
+
+            <div class="stat-label">
+                Average Score
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🔄
+            </div>
+
+            <div class="stat-value">
+                {{ performance[2] }}
+            </div>
+
+            <div class="stat-label">
+                Total Attempts
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =================================================
+         LEARNING ACTIVITIES
+    ================================================== -->
+
+    <div class="card">
+
+        <h2 class="card-title">
+            📚 Learning Activity History
+        </h2>
+
+
+        {% if activities %}
+
+            <div class="activity-table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Activity
+                            </th>
+
+                            <th>
+                                Score
+                            </th>
+
+                            <th>
+                                Attempts
+                            </th>
+
+                            <th>
+                                Time
+                            </th>
+
+                            <th>
+                                Remarks
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for activity in activities %}
+
+                            <tr>
+
+                                <td>
+                                    {{ activity[2] }}
+                                </td>
+
+                                <td>
+                                    {{ activity[1] }}
+                                </td>
+
+                                <td class="score">
+
+                                    {{ activity[3] }}
+                                    /
+                                    {{ activity[4] }}
+
+                                </td>
+
+                                <td>
+                                    {{ activity[5] }}
+                                </td>
+
+                                <td>
+
+                                    {% if activity[6] is not none %}
+
+                                        {{ activity[6] }} sec
+
+                                    {% else %}
+
+                                        -
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td class="remarks">
+
+                                    {{ activity[7] or "-" }}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        {% else %}
+
+            <div class="no-data">
+
+                📚 No learning activities recorded yet.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =================================================
+         BACK
+    ================================================== -->
+
+    <div class="back">
+
+        <a
+            href="{{ url_for('teacher.teacher_students') }}"
+            class="back-btn"
+        >
+            ← Back to My Students
+        </a>
+
+    </div>
+
+
+</div>
+
+</body>
+
+</html>
