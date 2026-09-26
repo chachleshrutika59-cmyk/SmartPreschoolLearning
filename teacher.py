@@ -1249,7 +1249,145 @@ def add_learning_activity():
     # =========================================================
 
     return render_template(
-        "add_learning_activity.html",
+        "add_activity.html",
         students=students,
         academic_year_name=academic_year_name
+    )
+
+
+@teacher.route("/activity/add", methods=["GET", "POST"])
+def add_activity():
+
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    if session.get("role") != "TEACHER":
+        return "Access Denied", 403
+
+    teacher_user_id = session["user_id"]
+
+    conn = get_connection()
+
+    try:
+        with conn.cursor() as cur:
+
+            # Get teacher ID
+            cur.execute("""
+                SELECT id, teacher_name
+                FROM teachers
+                WHERE user_id = %s
+            """, (teacher_user_id,))
+
+            teacher_data = cur.fetchone()
+
+            if not teacher_data:
+                return "Teacher profile not found.", 404
+
+            teacher_id = teacher_data[0]
+            teacher_name = teacher_data[1]
+
+            # Get students belonging to classes
+            # assigned to this teacher
+            cur.execute("""
+                SELECT DISTINCT
+                    s.id,
+                    s.student_name,
+                    s.admission_number,
+                    c.class_name,
+                    se.id AS enrollment_id
+                FROM class_teacher_assignments cta
+                JOIN student_enrollments se
+                    ON cta.class_id = se.class_id
+                   AND cta.academic_year_id = se.academic_year_id
+                JOIN students s
+                    ON se.student_id = s.id
+                JOIN classes c
+                    ON se.class_id = c.id
+                WHERE cta.teacher_id = %s
+                  AND se.status = 'ACTIVE'
+                ORDER BY c.class_order, s.student_name
+            """, (teacher_id,))
+
+            students = cur.fetchall()
+
+            if request.method == "POST":
+
+                student_id = request.form.get("student_id")
+                enrollment_id = request.form.get("enrollment_id")
+                activity_name = request.form.get("activity_name")
+                activity_date = request.form.get("activity_date")
+                score = request.form.get("score")
+                max_score = request.form.get("max_score")
+                attempts = request.form.get("attempts")
+                time_taken = request.form.get("time_taken_seconds")
+                remarks = request.form.get("remarks")
+
+                # Basic validation
+                if not student_id or not activity_name:
+                    return "Student and activity name are required.", 400
+
+                # Verify that the selected student
+                # actually belongs to this teacher
+                cur.execute("""
+                    SELECT 1
+                    FROM class_teacher_assignments cta
+                    JOIN student_enrollments se
+                        ON cta.class_id = se.class_id
+                       AND cta.academic_year_id = se.academic_year_id
+                    WHERE cta.teacher_id = %s
+                      AND se.student_id = %s
+                      AND se.status = 'ACTIVE'
+                """, (teacher_id, student_id))
+
+                if not cur.fetchone():
+                    return "You are not authorized to add activity for this student.", 403
+
+                cur.execute("""
+                    INSERT INTO learning_activities
+                    (
+                        student_id,
+                        enrollment_id,
+                        activity_name,
+                        activity_date,
+                        score,
+                        max_score,
+                        attempts,
+                        time_taken_seconds,
+                        teacher_id,
+                        remarks
+                    )
+                    VALUES
+                    (
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s
+                    )
+                """, (
+                    student_id,
+                    enrollment_id if enrollment_id else None,
+                    activity_name,
+                    activity_date if activity_date else None,
+                    score if score else None,
+                    max_score if max_score else 10,
+                    attempts if attempts else 1,
+                    time_taken if time_taken else None,
+                    teacher_id,
+                    remarks
+                ))
+
+                conn.commit()
+
+                return redirect(
+                    url_for(
+                        "teacher.teacher_student_profile",
+                        student_id=student_id
+                    )
+                )
+
+    finally:
+        conn.close()
+
+    return render_template(
+        "add_activity.html",
+        teacher_name=teacher_name,
+        students=students
     )

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Learning Activity</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 20px 35px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #243b53;
+            font-size: 24px;
+        }
+
+        .teacher-name {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h2 {
+            color: #243b53;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            margin-bottom: 7px;
+            font-weight: 600;
+            color: #334e68;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 12px;
+
+            border: 1px solid #d9e2ec;
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            outline: none;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #4f46e5;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .selected-student {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .selected-student strong {
+            color: #3730a3;
+            font-size: 16px;
+        }
+
+        .selected-student p {
+            margin-top: 6px;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .buttons {
+            margin-top: 30px;
+
+            display: flex;
+            gap: 15px;
+        }
+
+        button,
+        .back-btn {
+            padding: 12px 22px;
+
+            border: none;
+            border-radius: 8px;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .save-btn {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #4338ca;
+        }
+
+        .back-btn {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .back-btn:hover {
+            background: #cbd5e1;
+        }
+
+        @media (max-width: 700px) {
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .container {
+                width: 94%;
+            }
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>
+            Add Learning Activity
+        </h1>
+
+        <div class="teacher-name">
+            Teacher: {{ teacher_name }}
+        </div>
+
+    </div>
+
+
+    <!-- MAIN CONTAINER -->
+
+    <div class="container">
+
+        <div class="card">
+
+            <h2>
+                Record Student Performance
+            </h2>
+
+            <p class="subtitle">
+                Enter the student's learning activity and performance details.
+            </p>
+
+
+            <form method="POST">
+
+                <div class="form-grid">
+
+
+                    <!-- ================================= -->
+                    <!-- STUDENT -->
+                    <!-- ================================= -->
+
+                    {% if selected_student %}
+
+                        <!--
+                            Student was selected from
+                            Teacher Student Card
+                        -->
+
+                        <div class="form-group full">
+
+                            <label>
+                                Student
+                            </label>
+
+                            <div class="selected-student">
+
+                                <strong>
+                                    👧 {{ selected_student[1] }}
+                                </strong>
+
+                                <p>
+                                    Admission No:
+                                    {{ selected_student[2] }}
+                                </p>
+
+                                <p>
+                                    Class:
+                                    {{ selected_student[3] }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!--
+                            Hidden values are submitted
+                            to Flask.
+                        -->
+
+                        <input
+                            type="hidden"
+                            name="student_id"
+                            value="{{ selected_student[0] }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="enrollment_id"
+                            value="{{ selected_student[4] }}"
+                        >
+
+
+                    {% else %}
+
+                        <!-- ================================= -->
+                        <!-- NORMAL STUDENT SELECTION -->
+                        <!-- ================================= -->
+
+                        <div class="form-group full">
+
+                            <label for="student_id">
+                                Select Student
+                            </label>
+
+                            <select
+                                id="student_id"
+                                name="student_id"
+                                required
+                                onchange="setEnrollment(this)"
+                            >
+
+                                <option value="">
+                                    -- Select Student --
+                                </option>
+
+
+                                {% for student_item in students %}
+
+                                    <option
+                                        value="{{ student_item[0] }}"
+                                        data-enrollment="{{ student_item[4] }}"
+                                    >
+
+                                        {{ student_item[1] }}
+                                        — {{ student_item[2] }}
+                                        — {{ student_item[3] }}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Enrollment -->
+
+                        <input
+                            type="hidden"
+                            id="enrollment_id"
+                            name="enrollment_id"
+                        >
+
+                    {% endif %}
+
+
+
+                    <!-- ================================= -->
+                    <!-- ACTIVITY NAME -->
+                    <!-- ================================= -->
+
+                    <div class="form-group full">
+
+                        <label for="activity_name">
+                            Activity Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="activity_name"
+                            name="activity_name"
+                            placeholder="Example: Alphabets, Numbers, Colors"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- ================================= -->
+                    <!-- ACTIVITY DATE -->
+                    <!-- ================================= -->
+
+                    <div class="form-group">
+
+                        <label for="activity_date">
+                            Activity Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="activity_date"
+                            name="activity_date"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- ================================= -->
+                    <!-- SCORE -->
+                    <!-- ================================= -->
+
+                    <div class="form-group">
+
+                        <label for="score">
+                            Score
+                        </label>
+
+                        <input
+                            type="number"
+                            id="score"
+                            name="score"
+                            min="0"
+                            step="0.01"
+                            placeholder="Example: 8"
+                        >
+
+                    </div>
+
+
+
+                    <!-- ================================= -->
+                    <!-- MAXIMUM SCORE -->
+                    <!-- ================================= -->
+
+                    <div class="form-group">
+
+                        <label for="max_score">
+                            Maximum Score
+                        </label>
+
+                        <input
+                            type="number"
+                            id="max_score"
+                            name="max_score"
+                            min="1"
+                            step="0.01"
+                            value="10"
+                        >
+
+                    </div>
+
+
+
+                    <!-- ================================= -->
+                    <!-- ATTEMPTS -->
+                    <!-- ================================= -->
+
+                    <div class="form-group">
+
+                        <label for="attempts">
+                            Attempts
+                        </label>
+
+                        <input
+                            type="number"
+                            id="attempts"
+                            name="attempts"
+                            min="1"
+                            value="1"
+                        >
+
+                    </div>
+
+
+
+                    <!-- ================================= -->
+                    <!-- TIME TAKEN -->
+                    <!-- ================================= -->
+
+                    <div class="form-group">
+
+                        <label for="time_taken_seconds">
+                            Time Taken (seconds)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="time_taken_seconds"
+                            name="time_taken_seconds"
+                            min="0"
+                            placeholder="Example: 45"
+                        >
+
+                    </div>
+
+
+
+                    <!-- ================================= -->
+                    <!-- REMARKS -->
+                    <!-- ================================= -->
+
+                    <div class="form-group full">
+
+                        <label for="remarks">
+                            Teacher Remarks
+                        </label>
+
+                        <textarea
+                            id="remarks"
+                            name="remarks"
+                            placeholder="Write observations about the student's performance..."
+                        ></textarea>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- BUTTONS -->
+                <!-- ================================= -->
+
+                <div class="buttons">
+
+                    <button
+                        type="submit"
+                        class="save-btn"
+                    >
+                        Save Activity
+                    </button>
+
+
+                    <a
+                        href="{{ url_for('teacher_dashboard') }}"
+                        class="back-btn"
+                    >
+                        Back to Dashboard
+                    </a>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ================================= -->
+
+    <script>
+
+        /*
+         * When teacher manually selects
+         * a student, automatically get
+         * the enrollment ID.
+         */
+
+        function setEnrollment(selectElement) {
+
+            const selectedOption =
+                selectElement.options[
+                    selectElement.selectedIndex
+                ];
+
+            const enrollment =
+                selectedOption.getAttribute(
+                    "data-enrollment"
+                );
+
+            const enrollmentInput =
+                document.getElementById(
+                    "enrollment_id"
+                );
+
+            if (enrollmentInput) {
+
+                enrollmentInput.value =
+                    enrollment || "";
+
+            }
+
+        }
+
+
+        /*
+         * Automatically set today's date.
+         */
+
+        const dateInput =
+            document.getElementById(
+                "activity_date"
+            );
+
+        if (dateInput) {
+
+            dateInput.value =
+                new Date()
+                    .toISOString()
+                    .split("T")[0];
+
+        }
+
+    </script>
+
+</body>
+
+</html>

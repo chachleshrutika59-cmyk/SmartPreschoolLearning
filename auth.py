@@ -51,13 +51,19 @@ def login():
                 session["role"] = role
 
                 if role == "ADMIN":
-                    return redirect(url_for("admin_dashboard"))
+                    return redirect(
+                        url_for("admin_dashboard")
+                    )
 
                 elif role == "TEACHER":
-                    return redirect(url_for("teacher_dashboard"))
+                    return redirect(
+                        url_for("teacher_dashboard")
+                    )
 
                 elif role == "STUDENT":
-                    return redirect(url_for("student_dashboard"))
+                    return redirect(
+                        url_for("student.student_dashboard")
+                    )
 
         return "Invalid email or password"
 
@@ -69,4 +75,6 @@ def logout():
 
     session.clear()
 
-    return redirect(url_for("auth.login"))
+    return redirect(
+        url_for("auth.login")
+    )

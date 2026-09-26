@@ -607,14 +607,22 @@
 
     <div class="back">
 
-        <a
-            href="{{ url_for('teacher.teacher_students') }}"
-            class="back-btn"
-        >
-            ← Back to My Students
-        </a>
+    <a
+        href="{{ url_for('teacher.add_learning_activity', student_id=student[0]) }}"
+        class="back-btn"
+    >
+        📚 Add Learning Activity
+    </a>
 
-    </div>
+    <a
+        href="{{ url_for('teacher.teacher_students') }}"
+        class="back-btn"
+        style="margin-left: 10px;"
+    >
+        ← Back to My Students
+    </a>
+
+</div>
 
 
 </div>
