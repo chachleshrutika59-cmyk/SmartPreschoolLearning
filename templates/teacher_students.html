@@ -25,7 +25,9 @@
             padding: 30px;
         }
 
-        /* HEADER */
+        /* =========================
+           HEADER
+        ========================== */
 
         .page-header {
             background: white;
@@ -48,7 +50,9 @@
             font-size: 14px;
         }
 
-        /* ACADEMIC YEAR */
+        /* =========================
+           ACADEMIC YEAR
+        ========================== */
 
         .academic-year {
             display: inline-block;
@@ -61,7 +65,9 @@
             font-weight: bold;
         }
 
-        /* STUDENT GRID */
+        /* =========================
+           STUDENT GRID
+        ========================== */
 
         .students-grid {
             display: grid;
@@ -72,7 +78,9 @@
             gap: 22px;
         }
 
-        /* STUDENT CARD */
+        /* =========================
+           STUDENT CARD
+        ========================== */
 
         .student-card {
             background: white;
@@ -88,6 +96,10 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         }
 
+        /* =========================
+           STUDENT ICON
+        ========================== */
+
         .student-icon {
             width: 58px;
             height: 58px;
@@ -102,12 +114,20 @@
             margin-bottom: 16px;
         }
 
+        /* =========================
+           STUDENT NAME
+        ========================== */
+
         .student-name {
             font-size: 20px;
             font-weight: bold;
             color: #253858;
             margin-bottom: 6px;
         }
+
+        /* =========================
+           ADMISSION NUMBER
+        ========================== */
 
         .admission-number {
             color: #2878d7;
@@ -116,7 +136,9 @@
             margin-bottom: 18px;
         }
 
-        /* INFORMATION */
+        /* =========================
+           INFORMATION
+        ========================== */
 
         .student-info {
             border-top: 1px solid #edf0f5;
@@ -137,23 +159,26 @@
         .info-value {
             color: #344054;
             font-weight: 600;
+            text-align: right;
         }
 
-        /* BUTTON */
+        /* =========================
+           ACTION BUTTONS
+        ========================== */
 
         .student-actions {
             margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
+        .profile-btn,
         .activity-btn {
             display: block;
             width: 100%;
             text-align: center;
-
             text-decoration: none;
-
-            background: #eaf4ff;
-            color: #2878d7;
 
             padding: 12px;
 
@@ -164,12 +189,33 @@
             transition: 0.2s ease;
         }
 
+        /* PROFILE */
+
+        .profile-btn {
+            background: #fff0f5;
+            color: #e84d7a;
+        }
+
+        .profile-btn:hover {
+            background: #e84d7a;
+            color: white;
+        }
+
+        /* ACTIVITY */
+
+        .activity-btn {
+            background: #eaf4ff;
+            color: #2878d7;
+        }
+
         .activity-btn:hover {
             background: #2878d7;
             color: white;
         }
 
-        /* EMPTY */
+        /* =========================
+           EMPTY STATE
+        ========================== */
 
         .empty-state {
             background: white;
@@ -197,7 +243,9 @@
             color: #8992a3;
         }
 
-        /* BACK BUTTON */
+        /* =========================
+           BACK BUTTON
+        ========================== */
 
         .back-section {
             margin-top: 25px;
@@ -223,7 +271,9 @@
             color: white;
         }
 
-        /* MOBILE */
+        /* =========================
+           MOBILE
+        ========================== */
 
         @media (max-width: 600px) {
 
@@ -239,61 +289,15 @@
                 font-size: 23px;
             }
 
+            .info-row {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .info-value {
+                text-align: left;
+            }
         }
-        .student-actions {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.profile-btn {
-    display: block;
-    width: 100%;
-    text-align: center;
-
-    text-decoration: none;
-
-    background: #fff0f5;
-    color: #e84d7a;
-
-    padding: 12px;
-
-    border-radius: 10px;
-
-    font-weight: bold;
-
-    transition: 0.2s ease;
-}
-
-.profile-btn:hover {
-    background: #e84d7a;
-    color: white;
-}
-
-.activity-btn {
-    display: block;
-    width: 100%;
-    text-align: center;
-
-    text-decoration: none;
-
-    background: #eaf4ff;
-    color: #2878d7;
-
-    padding: 12px;
-
-    border-radius: 10px;
-
-    font-weight: bold;
-
-    transition: 0.2s ease;
-}
-
-.activity-btn:hover {
-    background: #2878d7;
-    color: white;
-}
 
     </style>
 
@@ -303,7 +307,6 @@
 <body>
 
 <div class="page-container">
-
 
     <!-- =====================================================
          HEADER
@@ -337,7 +340,9 @@
 
                 <div class="student-card">
 
-                    <!-- ICON -->
+                    <!-- =================================================
+                         STUDENT ICON
+                    ================================================== -->
 
                     <div class="student-icon">
 
@@ -350,21 +355,27 @@
                     </div>
 
 
-                    <!-- NAME -->
+                    <!-- =================================================
+                         STUDENT NAME
+                    ================================================== -->
 
                     <div class="student-name">
                         {{ student[1] }}
                     </div>
 
 
-                    <!-- ADMISSION NUMBER -->
+                    <!-- =================================================
+                         ADMISSION NUMBER
+                    ================================================== -->
 
                     <div class="admission-number">
                         Admission No: {{ student[2] }}
                     </div>
 
 
-                    <!-- INFORMATION -->
+                    <!-- =================================================
+                         STUDENT INFORMATION
+                    ================================================== -->
 
                     <div class="student-info">
 
@@ -409,25 +420,38 @@
                     </div>
 
 
-                    <!-- ACTION -->
+                    <!-- =================================================
+                         ACTION BUTTONS
+                    ================================================== -->
 
                     <div class="student-actions">
 
-    <a
-        href="{{ url_for('teacher.student_profile', student_id=student[0]) }}"
-        class="profile-btn"
-    >
-        👧 View Profile
-    </a>
+                        <!-- VIEW PROFILE -->
 
-    <a
-        href="{{ url_for('teacher.add_learning_activity') }}"
-        class="activity-btn"
-    >
-        📚 Add Learning Activity
-    </a>
+                        <a
+                            href="{{ url_for(
+                                'teacher.student_profile',
+                                student_id=student[0]
+                            ) }}"
+                            class="profile-btn"
+                        >
+                            👧 View Profile
+                        </a>
 
-</div>
+
+                        <!-- ADD LEARNING ACTIVITY -->
+
+                        <a
+                            href="{{ url_for(
+                                'teacher.add_learning_activity',
+                                student_id=student[0]
+                            ) }}"
+                            class="activity-btn"
+                        >
+                            📚 Add Learning Activity
+                        </a>
+
+                    </div>
 
                 </div>
 
@@ -437,7 +461,6 @@
 
 
     {% else %}
-
 
         <!-- =================================================
              NO STUDENTS
@@ -457,7 +480,6 @@
             </p>
 
         </div>
-
 
     {% endif %}
 

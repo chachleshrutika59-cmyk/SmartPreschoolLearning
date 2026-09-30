@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Attendance Management - Smart Preschool Learning</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="admin-layout">
+
+
+    <!-- ==================================================
+         SIDEBAR
+    =================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- LOGO -->
+
+        <div class="sidebar-logo">
+
+            <div style="font-size:38px;">
+                🧸
+            </div>
+
+            <h2>
+                Smart <span>Preschool</span>
+            </h2>
+
+            <small>
+                Learning Analytics
+            </small>
+
+        </div>
+
+
+        <!-- MENU -->
+
+        <ul class="sidebar-menu">
+
+
+            <li>
+                <a href="{{ url_for('teacher_dashboard') }}">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{{ url_for('teacher.teacher_students') }}">
+                    👧 My Students
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{{ url_for('teacher.add_learning_activity') }}">
+                    📚 Learning Activities
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    📝 Assessments
+                </a>
+            </li>
+
+
+            <!-- CURRENT PAGE -->
+
+            <li>
+                <a href="{{ url_for('teacher.teacher_attendance') }}"
+                   class="active">
+
+                    📅 Attendance
+
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    💬 Teacher Remarks
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    📊 Student Progress
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    💡 Recommendations
+                </a>
+            </li>
+
+
+        </ul>
+
+
+        <!-- LOGOUT -->
+
+        <div class="sidebar-logout">
+
+            <a href="{{ url_for('auth.logout') }}">
+
+                🚪 Logout
+
+            </a>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- ==================================================
+         MAIN CONTENT
+    =================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- ==================================================
+             PAGE HEADER
+        =================================================== -->
+
+        <div class="topbar">
+
+
+            <div>
+
+                <h1>
+                    📋 Attendance Management
+                </h1>
+
+                <p>
+                    Teacher: {{ teacher_name }}
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+             ACADEMIC YEAR
+        =================================================== -->
+
+        <div class="content-card"
+             style="margin-bottom:25px;">
+
+            <h3>
+                Academic Year: {{ academic_year_name }}
+            </h3>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             MARK ATTENDANCE
+        =================================================== -->
+
+        <div class="content-card">
+
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        ➕ Mark Attendance
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==================================================
+                 CLASS SELECTION
+            =================================================== -->
+
+            <form method="GET"
+                  action="{{ url_for('teacher.teacher_attendance') }}"
+                  style="
+                      margin-top:20px;
+                  ">
+
+
+                <div style="
+                    display:flex;
+                    gap:15px;
+                    align-items:end;
+                    flex-wrap:wrap;
+                ">
+
+
+                    <!-- SELECT CLASS -->
+
+                    <div style="
+                        flex:1;
+                        min-width:250px;
+                    ">
+
+                        <label style="
+                            display:block;
+                            margin-bottom:8px;
+                            font-weight:600;
+                            color:#334155;
+                        ">
+
+                            Select Class
+
+                        </label>
+
+
+                        <select name="class_id"
+                                required
+                                style="
+                                    width:100%;
+                                    padding:12px;
+                                    border:1px solid #dbe3ef;
+                                    border-radius:10px;
+                                    background:white;
+                                ">
+
+
+                            <option value="">
+
+                                -- Select Class --
+
+                            </option>
+
+
+                            {% for class_item in assigned_classes %}
+
+                            <option value="{{ class_item[0] }}"
+                                {% if selected_class_id == class_item[0] %}
+                                    selected
+                                {% endif %}>
+
+                                {{ class_item[1] }}
+
+                            </option>
+
+                            {% endfor %}
+
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- VIEW STUDENTS -->
+
+                    <div>
+
+                        <button type="submit"
+                                style="
+                                    padding:12px 22px;
+                                    border:none;
+                                    border-radius:10px;
+                                    background:#2674d9;
+                                    color:white;
+                                    font-weight:600;
+                                    cursor:pointer;
+                                ">
+
+                            View Students
+
+                        </button>
+
+                    </div>
+
+
+                </div>
+
+
+            </form>
+
+
+
+            {% if selected_class_id and students %}
+
+
+            <!-- ==================================================
+                 ATTENDANCE FORM
+            =================================================== -->
+
+            <form method="POST"
+                  action="{{ url_for('teacher.teacher_attendance') }}"
+                  style="margin-top:30px;">
+
+
+                <!-- KEEP SELECTED CLASS -->
+
+                <input type="hidden"
+                       name="class_id"
+                       value="{{ selected_class_id }}">
+
+
+
+                <!-- ==================================================
+                     ATTENDANCE DATE
+                =================================================== -->
+
+                <div style="
+                    margin-bottom:20px;
+                    max-width:300px;
+                ">
+
+
+                    <label style="
+                        display:block;
+                        margin-bottom:8px;
+                        font-weight:600;
+                        color:#334155;
+                    ">
+
+                        Attendance Date
+
+                    </label>
+
+
+                    <input type="date"
+                           name="attendance_date"
+                           value="{{ request.form.get('attendance_date', '') }}"
+                           required
+                           style="
+                               width:100%;
+                               padding:12px;
+                               border:1px solid #dbe3ef;
+                               border-radius:10px;
+                           ">
+
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     STUDENT ATTENDANCE TABLE
+                =================================================== -->
+
+                <div style="
+                    overflow-x:auto;
+                ">
+
+
+                    <table style="
+                        width:100%;
+                        border-collapse:collapse;
+                    ">
+
+
+                        <thead>
+
+
+                            <tr style="
+                                background:#f8fafc;
+                                border-bottom:2px solid #e2e8f0;
+                            ">
+
+
+                                <th style="
+                                    padding:14px;
+                                    text-align:left;
+                                ">
+
+                                    Student
+
+                                </th>
+
+
+                                <th style="
+                                    padding:14px;
+                                    text-align:left;
+                                ">
+
+                                    Admission No.
+
+                                </th>
+
+
+                                <th style="
+                                    padding:14px;
+                                    text-align:center;
+                                ">
+
+                                    Attendance
+
+                                </th>
+
+
+                            </tr>
+
+
+                        </thead>
+
+
+
+                        <tbody>
+
+
+                            {% for student in students %}
+
+
+                            <tr style="
+                                border-bottom:1px solid #eef2f7;
+                            ">
+
+
+                                <!-- STUDENT -->
+
+                                <td style="
+                                    padding:14px;
+                                    font-weight:600;
+                                ">
+
+                                    {{ student[1] }}
+
+                                </td>
+
+
+                                <!-- ADMISSION NUMBER -->
+
+                                <td style="
+                                    padding:14px;
+                                    color:#64748b;
+                                ">
+
+                                    {{ student[2] }}
+
+                                </td>
+
+
+                                <!-- ATTENDANCE -->
+
+                                <td style="
+                                    padding:14px;
+                                    text-align:center;
+                                ">
+
+
+                                    <div style="
+                                        display:flex;
+                                        justify-content:center;
+                                        gap:18px;
+                                        flex-wrap:wrap;
+                                    ">
+
+
+                                        <label>
+
+                                            <input type="radio"
+                                                   name="status_{{ student[0] }}"
+                                                   value="PRESENT"
+                                                   required>
+
+                                            Present
+
+                                        </label>
+
+
+                                        <label>
+
+                                            <input type="radio"
+                                                   name="status_{{ student[0] }}"
+                                                   value="ABSENT">
+
+                                            Absent
+
+                                        </label>
+
+
+                                        <label>
+
+                                            <input type="radio"
+                                                   name="status_{{ student[0] }}"
+                                                   value="LATE">
+
+                                            Late
+
+                                        </label>
+
+
+                                    </div>
+
+
+                                </td>
+
+
+                            </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     SAVE ATTENDANCE
+                =================================================== -->
+
+                <div style="
+                    margin-top:25px;
+                ">
+
+
+                    <button type="submit"
+                            style="
+                                padding:12px 24px;
+                                border:none;
+                                border-radius:10px;
+                                background:#16a34a;
+                                color:white;
+                                font-size:15px;
+                                font-weight:600;
+                                cursor:pointer;
+                            ">
+
+                        💾 Save Attendance
+
+                    </button>
+
+
+                </div>
+
+
+            </form>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+
+    </main>
+
+
+</div>
+
+
+</body>
+
+</html>

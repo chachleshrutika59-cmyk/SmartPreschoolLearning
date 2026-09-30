@@ -2,12 +2,14 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Add Learning Activity</title>
 
     <style>
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -19,6 +21,10 @@
             background: #f4f7fb;
             min-height: 100vh;
         }
+
+        /* =========================
+           HEADER
+        ========================= */
 
         .header {
             background: #ffffff;
@@ -40,11 +46,19 @@
             font-size: 14px;
         }
 
+        /* =========================
+           CONTAINER
+        ========================= */
+
         .container {
             width: 90%;
             max-width: 900px;
             margin: 40px auto;
         }
+
+        /* =========================
+           CARD
+        ========================= */
 
         .card {
             background: white;
@@ -63,6 +77,10 @@
             color: #64748b;
             margin-bottom: 25px;
         }
+
+        /* =========================
+           FORM
+        ========================= */
 
         .form-grid {
             display: grid;
@@ -86,21 +104,22 @@
         }
 
         input,
-        select,
-        textarea {
+        textarea,
+        select {
             padding: 12px;
 
             border: 1px solid #d9e2ec;
             border-radius: 8px;
 
             font-size: 14px;
-
             outline: none;
+
+            background: #ffffff;
         }
 
         input:focus,
-        select:focus,
-        textarea:focus {
+        textarea:focus,
+        select:focus {
             border-color: #4f46e5;
         }
 
@@ -109,23 +128,44 @@
             min-height: 100px;
         }
 
+        /* =========================
+           SELECTED STUDENT
+        ========================= */
+
         .selected-student {
             background: #eef2ff;
             border: 1px solid #c7d2fe;
             border-radius: 10px;
-            padding: 15px;
+            padding: 18px;
         }
 
         .selected-student strong {
             color: #3730a3;
-            font-size: 16px;
+            font-size: 17px;
         }
 
         .selected-student p {
-            margin-top: 6px;
+            margin-top: 7px;
             color: #475569;
             font-size: 14px;
         }
+
+        .student-id {
+            font-weight: 600;
+        }
+
+        /* =========================
+           STUDENT DROPDOWN
+        ========================= */
+
+        .student-select {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
 
         .buttons {
             margin-top: 30px;
@@ -166,6 +206,10 @@
             background: #cbd5e1;
         }
 
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
         @media (max-width: 700px) {
 
             .form-grid {
@@ -183,7 +227,9 @@
             .container {
                 width: 94%;
             }
+
         }
+
     </style>
 
 </head>
@@ -191,7 +237,10 @@
 
 <body>
 
-    <!-- HEADER -->
+
+    <!-- =========================
+         HEADER
+    ========================= -->
 
     <div class="header">
 
@@ -206,7 +255,9 @@
     </div>
 
 
-    <!-- MAIN CONTAINER -->
+    <!-- =========================
+         MAIN CONTAINER
+    ========================= -->
 
     <div class="container">
 
@@ -221,21 +272,28 @@
             </p>
 
 
-            <form method="POST">
+            <!-- =========================
+                 FORM
+            ========================= -->
+
+            <form
+                method="POST"
+                action="{{ url_for('teacher.add_learning_activity') }}"
+            >
 
                 <div class="form-grid">
 
 
-                    <!-- ================================= -->
-                    <!-- STUDENT -->
-                    <!-- ================================= -->
+                    <!-- =================================================
+                         STUDENT SECTION
+                    ================================================= -->
 
                     {% if selected_student %}
 
-                        <!--
-                            Student was selected from
-                            Teacher Student Card
-                        -->
+                        <!-- =============================================
+                             STUDENT AUTOMATICALLY SELECTED
+                             FROM STUDENT CARD
+                        ============================================== -->
 
                         <div class="form-group full">
 
@@ -248,6 +306,11 @@
                                 <strong>
                                     👧 {{ selected_student[1] }}
                                 </strong>
+
+                                <p class="student-id">
+                                    Student ID:
+                                    {{ selected_student[0] }}
+                                </p>
 
                                 <p>
                                     Admission No:
@@ -264,10 +327,7 @@
                         </div>
 
 
-                        <!--
-                            Hidden values are submitted
-                            to Flask.
-                        -->
+                        <!-- Hidden student ID -->
 
                         <input
                             type="hidden"
@@ -275,47 +335,38 @@
                             value="{{ selected_student[0] }}"
                         >
 
-                        <input
-                            type="hidden"
-                            name="enrollment_id"
-                            value="{{ selected_student[4] }}"
-                        >
-
 
                     {% else %}
 
-                        <!-- ================================= -->
-                        <!-- NORMAL STUDENT SELECTION -->
-                        <!-- ================================= -->
+                        <!-- =============================================
+                             STUDENT DROPDOWN
+                             FROM QUICK ACTION
+                        ============================================== -->
 
                         <div class="form-group full">
 
                             <label for="student_id">
-                                Select Student
+                                Student
                             </label>
 
                             <select
                                 id="student_id"
                                 name="student_id"
+                                class="student-select"
                                 required
-                                onchange="setEnrollment(this)"
                             >
 
                                 <option value="">
                                     -- Select Student --
                                 </option>
 
+                                {% for student in teacher_students %}
 
-                                {% for student_item in students %}
+                                    <option value="{{ student[0] }}">
 
-                                    <option
-                                        value="{{ student_item[0] }}"
-                                        data-enrollment="{{ student_item[4] }}"
-                                    >
-
-                                        {{ student_item[1] }}
-                                        — {{ student_item[2] }}
-                                        — {{ student_item[3] }}
+                                        {{ student[1] }}
+                                        — Admission No: {{ student[2] }}
+                                        — {{ student[3] }}
 
                                     </option>
 
@@ -325,22 +376,12 @@
 
                         </div>
 
-
-                        <!-- Enrollment -->
-
-                        <input
-                            type="hidden"
-                            id="enrollment_id"
-                            name="enrollment_id"
-                        >
-
                     {% endif %}
 
 
-
-                    <!-- ================================= -->
-                    <!-- ACTIVITY NAME -->
-                    <!-- ================================= -->
+                    <!-- =========================
+                         ACTIVITY NAME
+                    ========================= -->
 
                     <div class="form-group full">
 
@@ -359,10 +400,9 @@
                     </div>
 
 
-
-                    <!-- ================================= -->
-                    <!-- ACTIVITY DATE -->
-                    <!-- ================================= -->
+                    <!-- =========================
+                         ACTIVITY DATE
+                    ========================= -->
 
                     <div class="form-group">
 
@@ -380,10 +420,9 @@
                     </div>
 
 
-
-                    <!-- ================================= -->
-                    <!-- SCORE -->
-                    <!-- ================================= -->
+                    <!-- =========================
+                         SCORE
+                    ========================= -->
 
                     <div class="form-group">
 
@@ -398,15 +437,15 @@
                             min="0"
                             step="0.01"
                             placeholder="Example: 8"
+                            required
                         >
 
                     </div>
 
 
-
-                    <!-- ================================= -->
-                    <!-- MAXIMUM SCORE -->
-                    <!-- ================================= -->
+                    <!-- =========================
+                         MAXIMUM SCORE
+                    ========================= -->
 
                     <div class="form-group">
 
@@ -420,16 +459,16 @@
                             name="max_score"
                             min="1"
                             step="0.01"
-                            value="10"
+                            placeholder="Example: 10"
+                            required
                         >
 
                     </div>
 
 
-
-                    <!-- ================================= -->
-                    <!-- ATTEMPTS -->
-                    <!-- ================================= -->
+                    <!-- =========================
+                         ATTEMPTS
+                    ========================= -->
 
                     <div class="form-group">
 
@@ -442,21 +481,21 @@
                             id="attempts"
                             name="attempts"
                             min="1"
-                            value="1"
+                            placeholder="Example: 2"
+                            required
                         >
 
                     </div>
 
 
-
-                    <!-- ================================= -->
-                    <!-- TIME TAKEN -->
-                    <!-- ================================= -->
+                    <!-- =========================
+                         TIME TAKEN
+                    ========================= -->
 
                     <div class="form-group">
 
                         <label for="time_taken_seconds">
-                            Time Taken (seconds)
+                            Time Taken (Seconds)
                         </label>
 
                         <input
@@ -465,15 +504,15 @@
                             name="time_taken_seconds"
                             min="0"
                             placeholder="Example: 45"
+                            required
                         >
 
                     </div>
 
 
-
-                    <!-- ================================= -->
-                    <!-- REMARKS -->
-                    <!-- ================================= -->
+                    <!-- =========================
+                         TEACHER REMARKS
+                    ========================= -->
 
                     <div class="form-group full">
 
@@ -485,6 +524,7 @@
                             id="remarks"
                             name="remarks"
                             placeholder="Write observations about the student's performance..."
+                            required
                         ></textarea>
 
                     </div>
@@ -493,9 +533,9 @@
                 </div>
 
 
-                <!-- ================================= -->
-                <!-- BUTTONS -->
-                <!-- ================================= -->
+                <!-- =========================
+                     BUTTONS
+                ========================= -->
 
                 <div class="buttons">
 
@@ -523,66 +563,6 @@
 
     </div>
 
-
-
-    <!-- ================================= -->
-    <!-- JAVASCRIPT -->
-    <!-- ================================= -->
-
-    <script>
-
-        /*
-         * When teacher manually selects
-         * a student, automatically get
-         * the enrollment ID.
-         */
-
-        function setEnrollment(selectElement) {
-
-            const selectedOption =
-                selectElement.options[
-                    selectElement.selectedIndex
-                ];
-
-            const enrollment =
-                selectedOption.getAttribute(
-                    "data-enrollment"
-                );
-
-            const enrollmentInput =
-                document.getElementById(
-                    "enrollment_id"
-                );
-
-            if (enrollmentInput) {
-
-                enrollmentInput.value =
-                    enrollment || "";
-
-            }
-
-        }
-
-
-        /*
-         * Automatically set today's date.
-         */
-
-        const dateInput =
-            document.getElementById(
-                "activity_date"
-            );
-
-        if (dateInput) {
-
-            dateInput.value =
-                new Date()
-                    .toISOString()
-                    .split("T")[0];
-
-        }
-
-    </script>
 
 </body>
 

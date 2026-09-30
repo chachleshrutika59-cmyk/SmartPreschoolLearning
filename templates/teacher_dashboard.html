@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -106,11 +107,13 @@
             </li>
 
 
-            <!-- ATTENDANCE -->
+            <!-- ======================================
+                 ATTENDANCE - MARK ATTENDANCE
+            ======================================= -->
 
             <li>
 
-                <a href="#">
+                <a href="{{ url_for('teacher.teacher_attendance') }}">
 
                     📅 Attendance
 
@@ -580,7 +583,7 @@
 
                     <!-- VIEW STUDENTS -->
 
-                     <a href="{{ url_for('teacher.teacher_class_students', class_id=class_item[0]) }}"
+                    <a href="{{ url_for('teacher.teacher_class_students', class_id=class_item[0]) }}"
                        style="
                            display: block;
                            text-align: center;
@@ -734,14 +737,16 @@
 
 
 
-                <!-- ATTENDANCE -->
+                <!-- ======================================
+                     ATTENDANCE RECORDS
+                ======================================= -->
 
-                <a href="#"
-                   class="action-card action-yellow">
+                <a href="{{ url_for('teacher.attendance_records') }}"
+   class="action-card action-yellow">
 
 
                     <div class="action-icon">
-                        📅
+                        📊
                     </div>
 
 
@@ -751,7 +756,7 @@
 
 
                     <p>
-                        Record student attendance
+                        View attendance records
                     </p>
 
 
@@ -886,3 +891,4 @@
 </body>
 
 </html>
+```
