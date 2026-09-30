@@ -98,7 +98,7 @@
 
             <li>
 
-                <a href="#">
+                <a href="{{ url_for('teacher.teacher_assessments') }}">
 
                     📝 Assessments
 
@@ -139,11 +139,9 @@
 
             <li>
 
-                <a href="#">
-
-                    📊 Student Progress
-
-                </a>
+                <a href="{{ url_for('teacher.teacher_progress') }}">
+    📊 Student Progress
+</a>
 
             </li>
 
@@ -766,8 +764,8 @@
 
                 <!-- VIEW PROGRESS -->
 
-                <a href="#"
-                   class="action-card action-green">
+                <a href="{{ url_for('teacher.teacher_progress') }}"
+   class="action-card action-green">
 
 
                     <div class="action-icon">

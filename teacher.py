@@ -1835,3 +1835,803 @@ def attendance_records():
 
         daily_records=daily_records
     )
+
+# =========================================================
+# TEACHER - ASSESSMENTS
+# =========================================================
+
+@teacher.route("/teacher/assessments", methods=["GET", "POST"])
+def teacher_assessments():
+
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    if session.get("role") != "TEACHER":
+        return "Access Denied", 403
+
+    teacher_user_id = session["user_id"]
+
+    conn = get_connection()
+
+    try:
+
+        with conn.cursor() as cur:
+
+            # -------------------------------------------------
+            # GET TEACHER
+            # -------------------------------------------------
+
+            cur.execute(
+                """
+                SELECT id, teacher_name
+                FROM teachers
+                WHERE user_id = %s
+                """,
+                (teacher_user_id,)
+            )
+
+            teacher_data = cur.fetchone()
+
+            if not teacher_data:
+                return "Teacher profile not found.", 404
+
+            teacher_id = teacher_data[0]
+            teacher_name = teacher_data[1]
+
+
+            # -------------------------------------------------
+            # CURRENT ACADEMIC YEAR
+            # -------------------------------------------------
+
+            cur.execute(
+                """
+                SELECT id, year_name
+                FROM academic_years
+                WHERE is_current = TRUE
+                LIMIT 1
+                """
+            )
+
+            current_year = cur.fetchone()
+
+            if not current_year:
+                return "Current academic year not found.", 404
+
+            academic_year_id = current_year[0]
+            academic_year_name = current_year[1]
+
+
+            # -------------------------------------------------
+            # GET CLASSES ASSIGNED TO TEACHER
+            # -------------------------------------------------
+
+            cur.execute(
+                """
+                SELECT
+                    c.id,
+                    c.class_name,
+                    c.class_order
+                FROM class_teacher_assignments cta
+
+                JOIN classes c
+                    ON cta.class_id = c.id
+
+                WHERE cta.teacher_id = %s
+                  AND cta.academic_year_id = %s
+
+                ORDER BY c.class_order
+                """,
+                (
+                    teacher_id,
+                    academic_year_id
+                )
+            )
+
+            assigned_classes = cur.fetchall()
+
+
+            # -------------------------------------------------
+            # SELECTED CLASS
+            # -------------------------------------------------
+
+            selected_class_id = request.args.get(
+                "class_id",
+                type=int
+            )
+
+            selected_student_id = request.args.get(
+                "student_id",
+                type=int
+            )
+
+
+            students = []
+
+
+            # -------------------------------------------------
+            # GET STUDENTS OF SELECTED CLASS
+            # -------------------------------------------------
+
+            if selected_class_id:
+
+                # Verify teacher is class teacher
+
+                cur.execute(
+                    """
+                    SELECT id
+                    FROM class_teacher_assignments
+                    WHERE teacher_id = %s
+                      AND class_id = %s
+                      AND academic_year_id = %s
+                    """,
+                    (
+                        teacher_id,
+                        selected_class_id,
+                        academic_year_id
+                    )
+                )
+
+                class_access = cur.fetchone()
+
+                if not class_access:
+                    return "You are not assigned to this class.", 403
+
+
+                # Get students
+
+                cur.execute(
+                    """
+                    SELECT
+                        s.id,
+                        s.student_name,
+                        s.admission_number,
+                        se.id AS enrollment_id
+                    FROM students s
+
+                    JOIN student_enrollments se
+                        ON s.id = se.student_id
+
+                    WHERE se.class_id = %s
+                      AND se.academic_year_id = %s
+                      AND se.status = 'ACTIVE'
+
+                    ORDER BY s.student_name
+                    """,
+                    (
+                        selected_class_id,
+                        academic_year_id
+                    )
+                )
+
+                students = cur.fetchall()
+
+
+            # -------------------------------------------------
+            # SAVE ASSESSMENT
+            # -------------------------------------------------
+
+            if request.method == "POST":
+
+                selected_class_id = request.form.get(
+                    "class_id",
+                    type=int
+                )
+
+                selected_student_id = request.form.get(
+                    "student_id",
+                    type=int
+                )
+
+                assessment_name = request.form.get(
+                    "assessment_name",
+                    ""
+                ).strip()
+
+                learning_area = request.form.get(
+                    "learning_area",
+                    ""
+                ).strip()
+
+                assessment_date = request.form.get(
+                    "assessment_date",
+                    ""
+                ).strip()
+
+                score = request.form.get(
+                    "score",
+                    ""
+                ).strip()
+
+                max_score = request.form.get(
+                    "max_score",
+                    "10"
+                ).strip()
+
+                teacher_remark = request.form.get(
+                    "teacher_remark",
+                    ""
+                ).strip()
+
+
+                # -------------------------------------------------
+                # VALIDATION
+                # -------------------------------------------------
+
+                if not selected_class_id:
+                    return "Please select a class.", 400
+
+                if not selected_student_id:
+                    return "Please select a student.", 400
+
+                if not assessment_name:
+                    return "Assessment name is required.", 400
+
+                if not learning_area:
+                    return "Learning area is required.", 400
+
+                if not assessment_date:
+                    return "Assessment date is required.", 400
+
+                if not score:
+                    return "Score is required.", 400
+
+
+                # -------------------------------------------------
+                # VERIFY STUDENT BELONGS TO TEACHER'S CLASS
+                # -------------------------------------------------
+
+                cur.execute(
+                    """
+                    SELECT
+                        se.id
+                    FROM student_enrollments se
+
+                    JOIN class_teacher_assignments cta
+                        ON se.class_id = cta.class_id
+                       AND se.academic_year_id = cta.academic_year_id
+
+                    WHERE se.student_id = %s
+                      AND se.class_id = %s
+                      AND se.academic_year_id = %s
+                      AND se.status = 'ACTIVE'
+                      AND cta.teacher_id = %s
+                    """,
+                    (
+                        selected_student_id,
+                        selected_class_id,
+                        academic_year_id,
+                        teacher_id
+                    )
+                )
+
+                enrollment = cur.fetchone()
+
+                if not enrollment:
+                    return "Student does not belong to your assigned class.", 403
+
+
+                enrollment_id = enrollment[0]
+
+
+                # -------------------------------------------------
+                # INSERT ASSESSMENT
+                # -------------------------------------------------
+
+                cur.execute(
+                    """
+                    INSERT INTO assessments
+                    (
+                        student_id,
+                        enrollment_id,
+                        assessment_name,
+                        learning_area,
+                        assessment_date,
+                        score,
+                        max_score,
+                        teacher_id,
+                        teacher_remark
+                    )
+                    VALUES
+                    (
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                    )
+                    """,
+                    (
+                        selected_student_id,
+                        enrollment_id,
+                        assessment_name,
+                        learning_area,
+                        assessment_date,
+                        score,
+                        max_score,
+                        teacher_id,
+                        teacher_remark
+                    )
+                )
+
+
+                conn.commit()
+
+
+                return redirect(
+                    url_for(
+                        "teacher.teacher_assessments"
+                    )
+                )
+
+
+    except Exception as e:
+
+        conn.rollback()
+
+        return f"Error saving assessment: {e}", 500
+
+
+    finally:
+
+        conn.close()
+
+
+    return render_template(
+        "teacher_assessments.html",
+        teacher_name=teacher_name,
+        academic_year_name=academic_year_name,
+        assigned_classes=assigned_classes,
+        selected_class_id=selected_class_id,
+        selected_student_id=selected_student_id,
+        students=students
+    )
+
+
+# =========================================================
+# TEACHER - STUDENT PROGRESS / ANALYTICS
+# =========================================================
+@teacher.route("/teacher/progress")
+def teacher_progress():
+
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    if session.get("role") != "TEACHER":
+        return "Access Denied", 403
+
+    teacher_user_id = session["user_id"]
+    conn = get_connection()
+
+    try:
+        with conn.cursor() as cur:
+
+            # -----------------------------------------
+            # 1. Get teacher
+            # -----------------------------------------
+            cur.execute("""
+                SELECT id, teacher_name
+                FROM teachers
+                WHERE user_id = %s
+            """, (teacher_user_id,))
+
+            teacher_data = cur.fetchone()
+
+            if not teacher_data:
+                return "Teacher profile not found.", 404
+
+            teacher_id = teacher_data[0]
+            teacher_name = teacher_data[1]
+
+            # -----------------------------------------
+            # 2. Get current academic year
+            # -----------------------------------------
+            cur.execute("""
+                SELECT id, year_name
+                FROM academic_years
+                WHERE is_current = TRUE
+                LIMIT 1
+            """)
+
+            current_year = cur.fetchone()
+
+            if not current_year:
+                return "Current academic year not found.", 404
+
+            academic_year_id = current_year[0]
+            academic_year_name = current_year[1]
+
+            # -----------------------------------------
+            # 3. Get teacher's assigned classes
+            # -----------------------------------------
+            cur.execute("""
+                SELECT
+                    c.id,
+                    c.class_name,
+                    c.class_order
+                FROM class_teacher_assignments cta
+                JOIN classes c
+                    ON cta.class_id = c.id
+                WHERE cta.teacher_id = %s
+                  AND cta.academic_year_id = %s
+                ORDER BY c.class_order
+            """, (teacher_id, academic_year_id))
+
+            assigned_classes = cur.fetchall()
+
+            # -----------------------------------------
+            # 4. Selected class
+            # -----------------------------------------
+            selected_class_id = request.args.get(
+                "class_id",
+                type=int
+            )
+
+            if not selected_class_id and assigned_classes:
+                selected_class_id = assigned_classes[0][0]
+
+            students_progress = []
+
+            # -----------------------------------------
+            # 5. Load students
+            # -----------------------------------------
+            if selected_class_id:
+
+                # Verify teacher is class teacher
+                cur.execute("""
+                    SELECT c.id, c.class_name
+                    FROM class_teacher_assignments cta
+                    JOIN classes c
+                        ON cta.class_id = c.id
+                    WHERE cta.teacher_id = %s
+                      AND cta.class_id = %s
+                      AND cta.academic_year_id = %s
+                """, (
+                    teacher_id,
+                    selected_class_id,
+                    academic_year_id
+                ))
+
+                class_data = cur.fetchone()
+
+                if not class_data:
+                    return "You are not assigned to this class.", 403
+
+                # -----------------------------------------
+                # 6. Student analytics
+                # -----------------------------------------
+                cur.execute("""
+                    WITH activity_stats AS (
+                        SELECT
+                            student_id,
+                            enrollment_id,
+
+                            COUNT(*) AS activity_count,
+
+                            COALESCE(
+                                ROUND(
+                                    AVG(
+                                        CASE
+                                            WHEN max_score > 0
+                                            THEN (score / max_score) * 100
+                                            ELSE NULL
+                                        END
+                                    ),
+                                    2
+                                ),
+                                0
+                            ) AS activity_average,
+
+                            COALESCE(
+                                SUM(attempts),
+                                0
+                            ) AS total_attempts,
+
+                            COALESCE(
+                                ROUND(
+                                    AVG(time_taken_seconds),
+                                    2
+                                ),
+                                0
+                            ) AS average_time
+
+                        FROM learning_activities
+
+                        GROUP BY
+                            student_id,
+                            enrollment_id
+                    ),
+
+                    assessment_stats AS (
+                        SELECT
+                            student_id,
+                            enrollment_id,
+
+                            COUNT(*) AS assessment_count,
+
+                            COALESCE(
+                                ROUND(
+                                    AVG(
+                                        CASE
+                                            WHEN max_score > 0
+                                            THEN (score / max_score) * 100
+                                            ELSE NULL
+                                        END
+                                    ),
+                                    2
+                                ),
+                                0
+                            ) AS assessment_average
+
+                        FROM assessments
+
+                        GROUP BY
+                            student_id,
+                            enrollment_id
+                    ),
+
+                    attendance_stats AS (
+                        SELECT
+                            student_id,
+                            enrollment_id,
+
+                            COUNT(*) AS attendance_days,
+
+                            COALESCE(
+                                ROUND(
+                                    (
+                                        COUNT(
+                                            CASE
+                                                WHEN status IN ('PRESENT', 'LATE')
+                                                THEN 1
+                                            END
+                                        )::numeric
+                                        /
+                                        NULLIF(COUNT(*), 0)
+                                    ) * 100,
+                                    2
+                                ),
+                                0
+                            ) AS attendance_percentage
+
+                        FROM attendance
+
+                        GROUP BY
+                            student_id,
+                            enrollment_id
+                    )
+
+                    SELECT
+
+                        s.id,
+                        s.student_name,
+                        s.admission_number,
+
+                        COALESCE(
+                            ast.activity_count,
+                            0
+                        ) AS activity_count,
+
+                        COALESCE(
+                            ast.activity_average,
+                            0
+                        ) AS activity_average,
+
+                        COALESCE(
+                            ast.total_attempts,
+                            0
+                        ) AS total_attempts,
+
+                        COALESCE(
+                            ast.average_time,
+                            0
+                        ) AS average_time,
+
+                        COALESCE(
+                            asm.assessment_count,
+                            0
+                        ) AS assessment_count,
+
+                        COALESCE(
+                            asm.assessment_average,
+                            0
+                        ) AS assessment_average,
+
+                        COALESCE(
+                            ats.attendance_days,
+                            0
+                        ) AS attendance_days,
+
+                        COALESCE(
+                            ats.attendance_percentage,
+                            0
+                        ) AS attendance_percentage
+
+                    FROM students s
+
+                    JOIN student_enrollments se
+                        ON s.id = se.student_id
+
+                    LEFT JOIN activity_stats ast
+                        ON s.id = ast.student_id
+                       AND se.id = ast.enrollment_id
+
+                    LEFT JOIN assessment_stats asm
+                        ON s.id = asm.student_id
+                       AND se.id = asm.enrollment_id
+
+                    LEFT JOIN attendance_stats ats
+                        ON s.id = ats.student_id
+                       AND se.id = ats.enrollment_id
+
+                    WHERE se.class_id = %s
+                      AND se.academic_year_id = %s
+                      AND se.status = 'ACTIVE'
+
+                    ORDER BY s.student_name
+
+                """, (
+                    selected_class_id,
+                    academic_year_id
+                ))
+
+                students_progress = cur.fetchall()
+
+            # -----------------------------------------
+            # 7. Class averages
+            # -----------------------------------------
+            total_students = len(students_progress)
+
+            if total_students > 0:
+
+                class_activity_average = round(
+                    sum(
+                        float(row[4])
+                        for row in students_progress
+                    ) / total_students,
+                    2
+                )
+
+                class_assessment_average = round(
+                    sum(
+                        float(row[8])
+                        for row in students_progress
+                    ) / total_students,
+                    2
+                )
+
+                class_attendance_average = round(
+                    sum(
+                        float(row[10])
+                        for row in students_progress
+                    ) / total_students,
+                    2
+                )
+
+            else:
+
+                class_activity_average = 0
+                class_assessment_average = 0
+                class_attendance_average = 0
+
+            # -----------------------------------------
+            # 8. Improvement / Progress Trend
+            # -----------------------------------------
+
+            progress_data = {}
+
+            for student in students_progress:
+
+                student_id = student[0]
+
+                cur.execute("""
+                    SELECT
+                        activity_date,
+                        CASE
+                            WHEN max_score > 0
+                            THEN (score / max_score) * 100
+                            ELSE NULL
+                        END AS percentage
+
+                    FROM learning_activities
+
+                    WHERE student_id = %s
+
+                    AND enrollment_id IN (
+                        SELECT id
+                        FROM student_enrollments
+                        WHERE student_id = %s
+                          AND class_id = %s
+                          AND academic_year_id = %s
+                    )
+
+                    AND score IS NOT NULL
+                    AND max_score > 0
+
+                    ORDER BY activity_date ASC, id ASC
+                """, (
+                    student_id,
+                    student_id,
+                    selected_class_id,
+                    academic_year_id
+                ))
+
+                activity_scores = cur.fetchall()
+
+                trend = "No Data"
+                improvement = 0
+
+                if len(activity_scores) >= 2:
+
+                    scores = [
+                        float(row[1])
+                        for row in activity_scores
+                    ]
+
+                    midpoint = len(scores) // 2
+
+                    first_scores = scores[:midpoint]
+                    recent_scores = scores[midpoint:]
+
+                    first_average = (
+                        sum(first_scores)
+                        / len(first_scores)
+                    )
+
+                    recent_average = (
+                        sum(recent_scores)
+                        / len(recent_scores)
+                    )
+
+                    improvement = round(
+                        recent_average - first_average,
+                        2
+                    )
+
+                    if improvement > 5:
+                        trend = "Improving"
+
+                    elif improvement < -5:
+                        trend = "Declining"
+
+                    else:
+                        trend = "Stable"
+
+                progress_data[student_id] = {
+                    "trend": trend,
+                    "improvement": improvement
+                }
+
+    except Exception as e:
+
+        return f"Error loading progress analytics: {e}", 500
+
+    finally:
+        conn.close()
+
+    return render_template(
+        "teacher_progress.html",
+
+        teacher_name=teacher_name,
+
+        academic_year_name=academic_year_name,
+
+        assigned_classes=assigned_classes,
+
+        selected_class_id=selected_class_id,
+
+        students_progress=students_progress,
+
+        total_students=total_students,
+
+        class_activity_average=class_activity_average,
+
+        class_assessment_average=class_assessment_average,
+
+        class_attendance_average=class_attendance_average,
+
+        progress_data=progress_data
+    )

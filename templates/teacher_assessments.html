@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Assessment Management - Smart Preschool Learning</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="admin-layout">
+
+
+    <!-- ======================================
+         SIDEBAR
+    ======================================= -->
+
+    <aside class="sidebar">
+
+
+        <!-- LOGO -->
+
+        <div class="sidebar-logo">
+
+            <div style="font-size: 38px;">
+                🧸
+            </div>
+
+            <h2>
+                Smart <span>Preschool</span>
+            </h2>
+
+            <small>
+                Learning Analytics
+            </small>
+
+        </div>
+
+
+        <!-- MENU -->
+
+        <ul class="sidebar-menu">
+
+
+            <!-- DASHBOARD -->
+
+            <li>
+
+                <a href="{{ url_for('teacher_dashboard') }}">
+
+                    🏠 Dashboard
+
+                </a>
+
+            </li>
+
+
+            <!-- MY STUDENTS -->
+
+            <li>
+
+                <a href="{{ url_for('teacher.teacher_students') }}">
+
+                    👧 My Students
+
+                </a>
+
+            </li>
+
+
+            <!-- LEARNING ACTIVITIES -->
+
+            <li>
+
+                <a href="{{ url_for('teacher.add_learning_activity') }}">
+
+                    📚 Learning Activities
+
+                </a>
+
+            </li>
+
+
+            <!-- ASSESSMENTS -->
+
+            <li>
+
+                <a href="{{ url_for('teacher.teacher_assessments') }}"
+                   class="active">
+
+                    📝 Assessments
+
+                </a>
+
+            </li>
+
+
+            <!-- ATTENDANCE -->
+
+            <li>
+
+                <a href="{{ url_for('teacher.teacher_attendance') }}">
+
+                    📅 Attendance
+
+                </a>
+
+            </li>
+
+
+            <!-- TEACHER REMARKS -->
+
+            <li>
+
+                <a href="#">
+
+                    💬 Teacher Remarks
+
+                </a>
+
+            </li>
+
+
+            <!-- STUDENT PROGRESS -->
+
+            <li>
+
+                <a href="#">
+
+                    📊 Student Progress
+
+                </a>
+
+            </li>
+
+
+            <!-- RECOMMENDATIONS -->
+
+            <li>
+
+                <a href="#">
+
+                    💡 Recommendations
+
+                </a>
+
+            </li>
+
+
+        </ul>
+
+
+        <!-- LOGOUT -->
+
+        <div class="sidebar-logout">
+
+            <a href="{{ url_for('auth.logout') }}">
+
+                🚪 Logout
+
+            </a>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- ======================================
+         MAIN CONTENT
+    ======================================= -->
+
+    <main class="main-content">
+
+
+        <!-- TOP BAR -->
+
+        <div class="topbar">
+
+
+            <div>
+
+                <h1>
+
+                    📝 Assessment Management
+
+                </h1>
+
+                <p>
+
+                    Record student assessment results and observations.
+
+                </p>
+
+            </div>
+
+
+            <!-- TEACHER PROFILE -->
+
+            <div class="admin-profile">
+
+                <div class="profile-avatar">
+
+                    👩‍🏫
+
+                </div>
+
+                <div>
+
+                    <strong>
+
+                        {{ teacher_name }}
+
+                    </strong>
+
+                    <small>
+
+                        Teacher
+
+                    </small>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ======================================
+             TEACHER INFORMATION
+        ======================================= -->
+
+        <div class="content-card"
+             style="margin-bottom: 25px;">
+
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        👩‍🏫 Teacher Information
+                    </h2>
+
+                    <p>
+                        Current teacher account and academic year
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 18px;
+                margin-top: 20px;
+            ">
+
+
+                <!-- TEACHER -->
+
+                <div style="
+                    background: #f8fbff;
+                    padding: 18px;
+                    border-radius: 14px;
+                ">
+
+                    <small style="color:#64748b;">
+
+                        Teacher Name
+
+                    </small>
+
+                    <h3 style="margin: 6px 0 0;">
+
+                        {{ teacher_name }}
+
+                    </h3>
+
+                </div>
+
+
+                <!-- ACADEMIC YEAR -->
+
+                <div style="
+                    background: #fff8fb;
+                    padding: 18px;
+                    border-radius: 14px;
+                ">
+
+                    <small style="color:#64748b;">
+
+                        Academic Year
+
+                    </small>
+
+                    <h3 style="margin: 6px 0 0;">
+
+                        {{ academic_year_name }}
+
+                    </h3>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ======================================
+             ADD ASSESSMENT
+        ======================================= -->
+
+        <div class="content-card">
+
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+
+                        ➕ Add Assessment
+
+                    </h2>
+
+                    <p>
+
+                        Enter assessment details for a student.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <form method="POST"
+                  style="margin-top: 25px;">
+
+
+                <!-- ======================================
+                     CLASS + STUDENT
+                ======================================= -->
+
+                <div style="
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                    gap: 20px;
+                    margin-bottom: 20px;
+                ">
+
+
+                    <!-- CLASS -->
+
+                    <div>
+
+                        <label
+                            for="class_id"
+                            style="
+                                display:block;
+                                margin-bottom:8px;
+                                font-weight:600;
+                            "
+                        >
+
+                            🏫 Select Class
+
+                        </label>
+
+
+                        <select
+                            id="class_id"
+                            name="class_id"
+                            required
+                            onchange="loadStudents()"
+                            style="
+                                width:100%;
+                                padding:12px;
+                                border:1px solid #dbe3ef;
+                                border-radius:10px;
+                            "
+                        >
+
+                            <option value="">
+
+                                -- Select Class --
+
+                            </option>
+
+
+                            {% for class_item in assigned_classes %}
+
+                            <option
+                                value="{{ class_item[0] }}"
+                                {% if selected_class_id == class_item[0] %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ class_item[1] }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- STUDENT -->
+
+                    <div>
+
+                        <label
+                            for="student_id"
+                            style="
+                                display:block;
+                                margin-bottom:8px;
+                                font-weight:600;
+                            "
+                        >
+
+                            👧 Select Student
+
+                        </label>
+
+
+                        <select
+                            id="student_id"
+                            name="student_id"
+                            required
+                            style="
+                                width:100%;
+                                padding:12px;
+                                border:1px solid #dbe3ef;
+                                border-radius:10px;
+                            "
+                        >
+
+                            <option value="">
+
+                                -- Select Student --
+
+                            </option>
+
+
+                            {% for student in students %}
+
+                            <option
+                                value="{{ student[0] }}"
+                                {% if selected_student_id == student[0] %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ student[1] }} - {{ student[2] }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+
+                        <small style="
+                            display:block;
+                            margin-top:7px;
+                            color:#64748b;
+                        ">
+
+                            Select a class first to load its students.
+
+                        </small>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- ======================================
+                     ASSESSMENT NAME + LEARNING AREA
+                ======================================= -->
+
+                <div style="
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                    gap: 20px;
+                    margin-bottom: 20px;
+                ">
+
+
+                    <!-- ASSESSMENT NAME -->
+
+                    <div>
+
+                        <label
+                            for="assessment_name"
+                            style="
+                                display:block;
+                                margin-bottom:8px;
+                                font-weight:600;
+                            "
+                        >
+
+                            📝 Assessment Name
+
+                        </label>
+
+
+                        <input
+                            type="text"
+                            id="assessment_name"
+                            name="assessment_name"
+                            placeholder="Example: Alphabet Recognition"
+                            required
+                            style="
+                                width:100%;
+                                padding:12px;
+                                border:1px solid #dbe3ef;
+                                border-radius:10px;
+                            "
+                        >
+
+                    </div>
+
+
+
+                    <!-- LEARNING AREA -->
+
+                    <div>
+
+                        <label
+                            for="learning_area"
+                            style="
+                                display:block;
+                                margin-bottom:8px;
+                                font-weight:600;
+                            "
+                        >
+
+                            📚 Learning Area
+
+                        </label>
+
+
+                        <select
+                            id="learning_area"
+                            name="learning_area"
+                            required
+                            style="
+                                width:100%;
+                                padding:12px;
+                                border:1px solid #dbe3ef;
+                                border-radius:10px;
+                            "
+                        >
+
+                            <option value="">
+
+                                -- Select Learning Area --
+
+                            </option>
+
+                            <option value="Alphabet & Language">
+
+                                Alphabet & Language
+
+                            </option>
+
+                            <option value="Numbers & Mathematics">
+
+                                Numbers & Mathematics
+
+                            </option>
+
+                            <option value="Colors">
+
+                                Colors
+
+                            </option>
+
+                            <option value="Shapes">
+
+                                Shapes
+
+                            </option>
+
+                            <option value="General Knowledge">
+
+                                General Knowledge
+
+                            </option>
+
+                            <option value="Rhymes">
+
+                                Rhymes
+
+                            </option>
+
+                            <option value="Drawing & Creativity">
+
+                                Drawing & Creativity
+
+                            </option>
+
+                            <option value="Fine Motor Skills">
+
+                                Fine Motor Skills
+
+                            </option>
+
+                            <option value="Social & Emotional Skills">
+
+                                Social & Emotional Skills
+
+                            </option>
+
+                            <option value="Other">
+
+                                Other
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- ======================================
+                     DATE + SCORE + MAX SCORE
+                ======================================= -->
+
+                <div style="
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 20px;
+                    margin-bottom: 20px;
+                ">
+
+
+                    <!-- DATE -->
+
+                    <div>
+
+                        <label
+                            for="assessment_date"
+                            style="
+                                display:block;
+                                margin-bottom:8px;
+                                font-weight:600;
+                            "
+                        >
+
+                            📅 Assessment Date
+
+                        </label>
+
+
+                        <input
+                            type="date"
+                            id="assessment_date"
+                            name="assessment_date"
+                            required
+                            style="
+                                width:100%;
+                                padding:12px;
+                                border:1px solid #dbe3ef;
+                                border-radius:10px;
+                            "
+                        >
+
+                    </div>
+
+
+
+                    <!-- SCORE -->
+
+                    <div>
+
+                        <label
+                            for="score"
+                            style="
+                                display:block;
+                                margin-bottom:8px;
+                                font-weight:600;
+                            "
+                        >
+
+                            ⭐ Score
+
+                        </label>
+
+
+                        <input
+                            type="number"
+                            id="score"
+                            name="score"
+                            min="0"
+                            step="0.01"
+                            placeholder="Example: 8"
+                            required
+                            style="
+                                width:100%;
+                                padding:12px;
+                                border:1px solid #dbe3ef;
+                                border-radius:10px;
+                            "
+                        >
+
+                    </div>
+
+
+
+                    <!-- MAX SCORE -->
+
+                    <div>
+
+                        <label
+                            for="max_score"
+                            style="
+                                display:block;
+                                margin-bottom:8px;
+                                font-weight:600;
+                            "
+                        >
+
+                            🎯 Max Score
+
+                        </label>
+
+
+                        <input
+                            type="number"
+                            id="max_score"
+                            name="max_score"
+                            min="1"
+                            step="0.01"
+                            value="10"
+                            required
+                            style="
+                                width:100%;
+                                padding:12px;
+                                border:1px solid #dbe3ef;
+                                border-radius:10px;
+                            "
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- ======================================
+                     TEACHER REMARK
+                ======================================= -->
+
+                <div style="margin-bottom: 25px;">
+
+                    <label
+                        for="teacher_remark"
+                        style="
+                            display:block;
+                            margin-bottom:8px;
+                            font-weight:600;
+                        "
+                    >
+
+                        💬 Teacher Remark
+
+                    </label>
+
+
+                    <textarea
+                        id="teacher_remark"
+                        name="teacher_remark"
+                        rows="4"
+                        placeholder="Enter teacher's observation or remark..."
+                        style="
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #dbe3ef;
+                            border-radius:10px;
+                            resize:vertical;
+                        "
+                    ></textarea>
+
+                </div>
+
+
+
+                <!-- ======================================
+                     BUTTONS
+                ======================================= -->
+
+                <div style="
+                    display:flex;
+                    gap:12px;
+                    flex-wrap:wrap;
+                ">
+
+
+                    <button
+                        type="submit"
+                        style="
+                            border:none;
+                            background:#4f8df7;
+                            color:white;
+                            padding:12px 24px;
+                            border-radius:10px;
+                            font-weight:600;
+                            cursor:pointer;
+                        "
+                    >
+
+                        💾 Save Assessment
+
+                    </button>
+
+
+                    <a
+                        href="{{ url_for('teacher_dashboard') }}"
+                        style="
+                            text-decoration:none;
+                            background:#f1f5f9;
+                            color:#334155;
+                            padding:12px 24px;
+                            border-radius:10px;
+                            font-weight:600;
+                        "
+                    >
+
+                        ← Back to Dashboard
+
+                    </a>
+
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+
+        <!-- FOOTER -->
+
+        <div class="dashboard-footer">
+
+            <span>
+
+                🧸 Smart Preschool Learning
+
+            </span>
+
+            <span>
+
+                Learn • Play • Grow 🌈
+
+            </span>
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- ======================================
+     CLASS CHANGE SCRIPT
+======================================= -->
+
+<script>
+
+function loadStudents() {
+
+    const classId =
+        document.getElementById("class_id").value;
+
+    if (classId) {
+
+        window.location.href =
+            "{{ url_for('teacher.teacher_assessments') }}"
+            + "?class_id="
+            + classId;
+
+    }
+
+}
+
+</script>
+
+
+<!-- ======================================
+     DEFAULT DATE
+======================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const dateInput =
+        document.getElementById("assessment_date");
+
+    if (dateInput && !dateInput.value) {
+
+        const today =
+            new Date().toISOString().split("T")[0];
+
+        dateInput.value = today;
+
+    }
+
+});
+
+</script>
+
+
+</body>
+
+</html>

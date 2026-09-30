@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Student Progress</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #333;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            width: 250px;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            padding: 25px 15px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h2 {
+            color: #5b4bdb;
+            font-size: 21px;
+        }
+
+        .logo p {
+            font-size: 12px;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .nav-link {
+            display: block;
+            text-decoration: none;
+            color: #555;
+            padding: 13px 15px;
+            margin-bottom: 7px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            background: #f0edff;
+            color: #5b4bdb;
+        }
+
+        .nav-link.active {
+            background: #eeeaff;
+            color: #5b4bdb;
+            font-weight: bold;
+        }
+
+        .logout {
+            margin-top: 20px;
+            color: #e74c3c;
+        }
+
+
+        /* =========================
+           MAIN CONTENT
+        ========================= */
+
+        .main {
+            margin-left: 250px;
+            padding: 30px;
+            width: calc(100% - 250px);
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #777;
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           CLASS FILTER
+        ========================= */
+
+        .filter-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            margin-bottom: 25px;
+        }
+
+        .filter-card h3 {
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .filter-form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-form select {
+            padding: 11px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            min-width: 220px;
+            font-size: 14px;
+        }
+
+        .filter-btn {
+            border: none;
+            background: #5b4bdb;
+            color: white;
+            padding: 11px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .filter-btn:hover {
+            background: #4938c5;
+        }
+
+
+        /* =========================
+           SUMMARY CARDS
+        ========================= */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 22px;
+            border-radius: 15px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .summary-icon {
+            font-size: 27px;
+            margin-bottom: 10px;
+        }
+
+        .summary-card h4 {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .summary-card h2 {
+            font-size: 25px;
+            color: #333;
+        }
+
+
+        /* =========================
+           STUDENT PROGRESS
+        ========================= */
+
+        .section-title {
+            margin-bottom: 15px;
+        }
+
+        .section-title h2 {
+            font-size: 21px;
+            color: #333;
+        }
+
+        .student-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 20px;
+        }
+
+        .student-card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .student-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .student-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #eeeaff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .student-header h3 {
+            font-size: 17px;
+            margin-bottom: 4px;
+        }
+
+        .student-header p {
+            font-size: 12px;
+            color: #888;
+        }
+
+
+        /* =========================
+           METRICS
+        ========================= */
+
+        .metrics {
+            display: grid;
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 12px;
+        }
+
+        .metric {
+            background: #f8f9fc;
+            padding: 13px;
+            border-radius: 10px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #777;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 17px;
+            font-weight: bold;
+            color: #333;
+        }
+
+
+        /* =========================
+           EMPTY STATE
+        ========================= */
+
+        .empty-state {
+            background: white;
+            padding: 45px;
+            text-align: center;
+            border-radius: 15px;
+            color: #777;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            margin-top: 35px;
+            padding: 20px 0;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 12px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media(max-width: 1000px) {
+
+            .summary-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .student-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media(max-width: 700px) {
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+                padding: 20px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard">
+
+
+    <!-- ======================================
+         SIDEBAR
+    ======================================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <h2>🧸 Smart Preschool</h2>
+
+            <p>Learning Analytics</p>
+
+        </div>
+
+
+        <a href="{{ url_for('teacher_dashboard') }}"
+           class="nav-link">
+
+            🏠 Dashboard
+
+        </a>
+
+
+        <a href="{{ url_for('teacher.teacher_students') }}"
+           class="nav-link">
+
+            👧 My Students
+
+        </a>
+
+
+        <a href="{{ url_for('teacher.add_learning_activity') }}"
+           class="nav-link">
+
+            📚 Learning Activities
+
+        </a>
+
+
+        <a href="{{ url_for('teacher.teacher_assessments') }}"
+           class="nav-link">
+
+            📝 Assessments
+
+        </a>
+
+
+        <a href="{{ url_for('teacher.teacher_attendance') }}"
+           class="nav-link">
+
+            📅 Attendance
+
+        </a>
+
+
+        <a href="#"
+           class="nav-link">
+
+            💬 Teacher Remarks
+
+        </a>
+
+
+        <a href="{{ url_for('teacher.teacher_progress') }}"
+           class="nav-link active">
+
+            📊 Student Progress
+
+        </a>
+
+
+        <a href="#"
+           class="nav-link">
+
+            ⭐ Recommendations
+
+        </a>
+
+
+        <a href="{{ url_for('auth.logout') }}"
+           class="nav-link logout">
+
+            🚪 Logout
+
+        </a>
+
+    </aside>
+
+
+
+    <!-- ======================================
+         MAIN
+    ======================================= -->
+
+    <main class="main">
+
+
+        <!-- HEADER -->
+
+        <div class="page-header">
+
+            <h1>
+                📊 Student Progress & Analytics
+            </h1>
+
+            <p>
+                Analyze student performance,
+                attendance and learning progress.
+            </p>
+
+        </div>
+
+
+
+        <!-- ======================================
+             CLASS FILTER
+        ======================================= -->
+
+        <div class="filter-card">
+
+            <h3>
+                🔎 Select Class
+            </h3>
+
+
+            <form method="GET"
+                  action="{{ url_for('teacher.teacher_progress') }}"
+                  class="filter-form">
+
+
+                <select name="class_id"
+                        required>
+
+                    {% for class_item in assigned_classes %}
+
+                        <option value="{{ class_item[0] }}"
+                            {% if selected_class_id == class_item[0] %}
+                                selected
+                            {% endif %}>
+
+                            {{ class_item[1] }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+                <button type="submit"
+                        class="filter-btn">
+
+                    View Progress
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- ======================================
+             SUMMARY
+        ======================================= -->
+
+        <div class="summary-grid">
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    👧
+                </div>
+
+                <h4>
+                    Total Students
+                </h4>
+
+                <h2>
+                    {{ total_students }}
+                </h2>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    📚
+                </div>
+
+                <h4>
+                    Activity Average
+                </h4>
+
+                <h2>
+                    {{ class_activity_average }}%
+                </h2>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    📝
+                </div>
+
+                <h4>
+                    Assessment Average
+                </h4>
+
+                <h2>
+                    {{ class_assessment_average }}%
+                </h2>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    📅
+                </div>
+
+                <h4>
+                    Attendance Average
+                </h4>
+
+                <h2>
+                    {{ class_attendance_average }}%
+                </h2>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ======================================
+             STUDENT PROGRESS
+        ======================================= -->
+
+        <div class="section-title">
+
+            <h2>
+                👧 Student-wise Progress
+            </h2>
+
+        </div>
+
+
+
+        {% if students_progress %}
+
+
+        <div class="student-grid">
+
+
+            {% for student in students_progress %}
+
+
+            <div class="student-card">
+
+
+                <!-- STUDENT HEADER -->
+
+                <div class="student-header">
+
+                    <div class="student-icon">
+                        👧
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            {{ student[1] }}
+                        </h3>
+
+                        <p>
+                            Admission No:
+                            {{ student[2] }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- METRICS -->
+
+                <div class="metrics">
+
+
+                    <div class="metric">
+
+                        <div class="metric-label">
+                            📚 Activities
+                        </div>
+
+                        <div class="metric-value">
+                            {{ student[3] }}
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="metric">
+
+                        <div class="metric-label">
+                            📊 Activity Average
+                        </div>
+
+                        <div class="metric-value">
+                            {{ student[4] }}%
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="metric">
+
+                        <div class="metric-label">
+                            🔁 Total Attempts
+                        </div>
+
+                        <div class="metric-value">
+                            {{ student[5] }}
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="metric">
+
+                        <div class="metric-label">
+                            ⏱ Average Time
+                        </div>
+
+                        <div class="metric-value">
+                            {{ student[6] }} sec
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="metric">
+
+                        <div class="metric-label">
+                            📝 Assessments
+                        </div>
+
+                        <div class="metric-value">
+                            {{ student[7] }}
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="metric">
+
+                        <div class="metric-label">
+                            ⭐ Assessment Average
+                        </div>
+
+                        <div class="metric-value">
+                            {{ student[8] }}%
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="metric">
+
+                        <div class="metric-label">
+                            📅 Attendance Days
+                        </div>
+
+                        <div class="metric-value">
+                            {{ student[9] }}
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="metric">
+
+                        <div class="metric-label">
+                            ✅ Attendance
+                        </div>
+
+                        <div class="metric-value">
+                            {{ student[10] }}%
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+        {% else %}
+
+
+        <div class="empty-state">
+
+            <div class="icon">
+                📊
+            </div>
+
+            <h3>
+                No Progress Data Available
+            </h3>
+
+            <p>
+                Add learning activities,
+                assessments or attendance
+                records to see analytics.
+            </p>
+
+        </div>
+
+
+        {% endif %}
+
+
+
+        <!-- ======================================
+             FOOTER
+        ======================================= -->
+
+        <div class="footer">
+
+            <span>
+                🧸 Smart Preschool Learning
+            </span>
+
+            <span>
+                Learn • Play • Grow 🌈
+            </span>
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+</body>
+
+</html>
