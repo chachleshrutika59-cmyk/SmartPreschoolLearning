@@ -2635,3 +2635,527 @@ def teacher_progress():
 
         progress_data=progress_data
     )
+
+
+    # =========================================================
+# TEACHER - PERSONALIZED RECOMMENDATIONS
+# =========================================================
+
+@teacher.route("/teacher/recommendations")
+def teacher_recommendations():
+
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    if session.get("role") != "TEACHER":
+        return "Access Denied", 403
+
+    teacher_user_id = session["user_id"]
+
+    conn = get_connection()
+
+    try:
+
+        with conn.cursor() as cur:
+
+            # =================================================
+            # GET TEACHER
+            # =================================================
+
+            cur.execute("""
+                SELECT id, teacher_name
+                FROM teachers
+                WHERE user_id = %s
+            """, (teacher_user_id,))
+
+            teacher_data = cur.fetchone()
+
+            if not teacher_data:
+                return "Teacher profile not found.", 404
+
+            teacher_id = teacher_data[0]
+            teacher_name = teacher_data[1]
+
+            # =================================================
+            # CURRENT ACADEMIC YEAR
+            # =================================================
+
+            cur.execute("""
+                SELECT id, year_name
+                FROM academic_years
+                WHERE is_current = TRUE
+                LIMIT 1
+            """)
+
+            current_year = cur.fetchone()
+
+            if not current_year:
+                return "Current academic year not found.", 404
+
+            academic_year_id = current_year[0]
+            academic_year_name = current_year[1]
+
+            # =================================================
+            # GET TEACHER'S ASSIGNED CLASSES
+            # =================================================
+
+            cur.execute("""
+                SELECT
+                    c.id,
+                    c.class_name,
+                    c.class_order
+                FROM class_teacher_assignments cta
+
+                JOIN classes c
+                    ON cta.class_id = c.id
+
+                WHERE cta.teacher_id = %s
+                  AND cta.academic_year_id = %s
+
+                ORDER BY c.class_order
+            """, (
+                teacher_id,
+                academic_year_id
+            ))
+
+            assigned_classes = cur.fetchall()
+
+            # =================================================
+            # SELECT CLASS
+            # =================================================
+
+            selected_class_id = request.args.get(
+                "class_id",
+                type=int
+            )
+
+            if not selected_class_id and assigned_classes:
+                selected_class_id = assigned_classes[0][0]
+
+            recommendations = []
+
+            # =================================================
+            # CHECK SELECTED CLASS
+            # =================================================
+
+            if selected_class_id:
+
+                cur.execute("""
+                    SELECT c.id, c.class_name
+                    FROM class_teacher_assignments cta
+
+                    JOIN classes c
+                        ON cta.class_id = c.id
+
+                    WHERE cta.teacher_id = %s
+                      AND cta.class_id = %s
+                      AND cta.academic_year_id = %s
+                """, (
+                    teacher_id,
+                    selected_class_id,
+                    academic_year_id
+                ))
+
+                class_data = cur.fetchone()
+
+                if not class_data:
+                    return "You are not assigned to this class.", 403
+
+                # =================================================
+                # GET STUDENT PERFORMANCE
+                # =================================================
+
+                cur.execute("""
+                    SELECT
+                        s.id,
+                        s.student_name,
+                        s.admission_number,
+
+                        COALESCE(
+                            ROUND(
+                                AVG(
+                                    CASE
+                                        WHEN la.max_score > 0
+                                        THEN
+                                            (la.score / la.max_score) * 100
+                                        ELSE NULL
+                                    END
+                                ),
+                                2
+                            ),
+                            0
+                        ) AS activity_average,
+
+                        COUNT(la.id) AS activity_count,
+
+                        COALESCE(
+                            ROUND(
+                                AVG(
+                                    CASE
+                                        WHEN a.max_score > 0
+                                        THEN
+                                            (a.score / a.max_score) * 100
+                                        ELSE NULL
+                                    END
+                                ),
+                                2
+                            ),
+                            0
+                        ) AS assessment_average,
+
+                        COALESCE(
+                            ROUND(
+                                (
+                                    COUNT(
+                                        CASE
+                                            WHEN att.status IN
+                                            ('PRESENT', 'LATE')
+                                            THEN 1
+                                        END
+                                    )::numeric
+                                    /
+                                    NULLIF(COUNT(att.id), 0)
+                                ) * 100,
+                                2
+                            ),
+                            0
+                        ) AS attendance_percentage
+
+                    FROM students s
+
+                    JOIN student_enrollments se
+                        ON s.id = se.student_id
+
+                    LEFT JOIN learning_activities la
+                        ON s.id = la.student_id
+                       AND se.id = la.enrollment_id
+
+                    LEFT JOIN assessments a
+                        ON s.id = a.student_id
+                       AND se.id = a.enrollment_id
+
+                    LEFT JOIN attendance att
+                        ON s.id = att.student_id
+                       AND se.id = att.enrollment_id
+
+                    WHERE se.class_id = %s
+                      AND se.academic_year_id = %s
+                      AND se.status = 'ACTIVE'
+
+                    GROUP BY
+                        s.id,
+                        s.student_name,
+                        s.admission_number
+
+                    ORDER BY s.student_name
+                """, (
+                    selected_class_id,
+                    academic_year_id
+                ))
+
+                students = cur.fetchall()
+
+                # =================================================
+                # GENERATE RECOMMENDATIONS
+                # =================================================
+
+                for student in students:
+
+                    student_id = student[0]
+                    student_name = student[1]
+                    admission_number = student[2]
+                    activity_average = float(student[3])
+                    activity_count = student[4]
+                    assessment_average = float(student[5])
+                    attendance_percentage = float(student[6])
+
+                    # ---------------------------------------------
+                    # RECOMMENDATION LOGIC
+                    # ---------------------------------------------
+
+                    if activity_count == 0:
+
+                        recommendation = (
+                            "Start with simple learning activities "
+                            "to understand the student's learning level."
+                        )
+
+                        learning_area = "General Learning"
+
+                    elif activity_average < 50:
+
+                        recommendation = (
+                            "Provide basic practice activities and "
+                            "repeat concepts using simple, interactive "
+                            "learning exercises."
+                        )
+
+                        learning_area = "Basic Skills"
+
+                    elif activity_average < 70:
+
+                        recommendation = (
+                            "Give additional practice activities and "
+                            "short revision exercises to improve "
+                            "understanding."
+                        )
+
+                        learning_area = "Practice & Revision"
+
+                    elif activity_average < 85:
+
+                        recommendation = (
+                            "Continue regular practice and introduce "
+                            "slightly more challenging activities."
+                        )
+
+                        learning_area = "Skill Development"
+
+                    else:
+
+                        recommendation = (
+                            "The student is performing well. Provide "
+                            "advanced and creative activities to maintain "
+                            "interest and encourage further learning."
+                        )
+
+                        learning_area = "Advanced Learning"
+
+                    # ---------------------------------------------
+                    # ASSESSMENT CONDITION
+                    # ---------------------------------------------
+
+                    if assessment_average > 0 and assessment_average < 50:
+
+                        recommendation += (
+                            " Focus on assessment topics where the "
+                            "student needs additional support."
+                        )
+
+                        learning_area = "Assessment Support"
+
+                    # ---------------------------------------------
+                    # ATTENDANCE CONDITION
+                    # ---------------------------------------------
+
+                    if (
+                        attendance_percentage > 0
+                        and attendance_percentage < 75
+                    ):
+
+                        recommendation += (
+                            " Regular attendance should also be "
+                            "encouraged for continuous learning."
+                        )
+
+                    recommendations.append({
+                        "student_id": student_id,
+                        "student_name": student_name,
+                        "admission_number": admission_number,
+                        "activity_average": activity_average,
+                        "assessment_average": assessment_average,
+                        "attendance_percentage": attendance_percentage,
+                        "learning_area": learning_area,
+                        "recommendation": recommendation
+                    })
+
+            # =================================================
+            # SAVE / UPDATE RECOMMENDATIONS IN DATABASE
+            # =================================================
+
+            for item in recommendations:
+
+                cur.execute("""
+                    SELECT id
+                    FROM recommendations
+                    WHERE student_id = %s
+                      AND enrollment_id = (
+                          SELECT id
+                          FROM student_enrollments
+                          WHERE student_id = %s
+                            AND class_id = %s
+                            AND academic_year_id = %s
+                          LIMIT 1
+                      )
+                """, (
+                    item["student_id"],
+                    item["student_id"],
+                    selected_class_id,
+                    academic_year_id
+                ))
+
+                existing = cur.fetchone()
+
+                if existing:
+
+                    cur.execute("""
+                        UPDATE recommendations
+                        SET
+                            learning_area = %s,
+                            recommendation = %s,
+                            generated_date = CURRENT_DATE
+                        WHERE id = %s
+                    """, (
+                        item["learning_area"],
+                        item["recommendation"],
+                        existing[0]
+                    ))
+
+                else:
+
+                    cur.execute("""
+                        INSERT INTO recommendations
+                        (
+                            student_id,
+                            enrollment_id,
+                            learning_area,
+                            recommendation,
+                            generated_date
+                        )
+                        VALUES
+                        (
+                            %s,
+                            (
+                                SELECT id
+                                FROM student_enrollments
+                                WHERE student_id = %s
+                                  AND class_id = %s
+                                  AND academic_year_id = %s
+                                LIMIT 1
+                            ),
+                            %s,
+                            %s,
+                            CURRENT_DATE
+                        )
+                    """, (
+                        item["student_id"],
+                        item["student_id"],
+                        selected_class_id,
+                        academic_year_id,
+                        item["learning_area"],
+                        item["recommendation"]
+                    ))
+
+            conn.commit()
+
+    except Exception as e:
+
+        conn.rollback()
+
+        return f"Error generating recommendations: {e}", 500
+
+    finally:
+
+        conn.close()
+
+    return render_template(
+        "teacher_recommendations.html",
+        teacher_name=teacher_name,
+        academic_year_name=academic_year_name,
+        assigned_classes=assigned_classes,
+        selected_class_id=selected_class_id,
+        recommendations=recommendations
+    )
+
+    # =========================================================
+# TEACHER - VIEW SAVED RECOMMENDATION RECORDS
+# =========================================================
+
+@teacher.route("/teacher/recommendations/records")
+def teacher_recommendation_records():
+
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    if session.get("role") != "TEACHER":
+        return "Access Denied", 403
+
+    teacher_user_id = session["user_id"]
+
+    conn = get_connection()
+
+    try:
+
+        with conn.cursor() as cur:
+
+            # Get teacher
+            cur.execute("""
+                SELECT id, teacher_name
+                FROM teachers
+                WHERE user_id = %s
+            """, (teacher_user_id,))
+
+            teacher_data = cur.fetchone()
+
+            if not teacher_data:
+                return "Teacher profile not found.", 404
+
+            teacher_id = teacher_data[0]
+            teacher_name = teacher_data[1]
+
+            # Get current academic year
+            cur.execute("""
+                SELECT id, year_name
+                FROM academic_years
+                WHERE is_current = TRUE
+                LIMIT 1
+            """)
+
+            current_year = cur.fetchone()
+
+            if not current_year:
+                return "Current academic year not found.", 404
+
+            academic_year_id = current_year[0]
+            academic_year_name = current_year[1]
+
+            # Get recommendations for students
+            # belonging to classes assigned to this teacher
+            cur.execute("""
+                SELECT
+                    r.id,
+                    s.student_name,
+                    s.admission_number,
+                    c.class_name,
+                    r.learning_area,
+                    r.recommendation,
+                    r.generated_date
+                FROM recommendations r
+
+                JOIN students s
+                    ON r.student_id = s.id
+
+                JOIN student_enrollments se
+                    ON r.enrollment_id = se.id
+
+                JOIN classes c
+                    ON se.class_id = c.id
+
+                JOIN class_teacher_assignments cta
+                    ON cta.class_id = se.class_id
+                   AND cta.academic_year_id = se.academic_year_id
+
+                WHERE cta.teacher_id = %s
+                  AND se.academic_year_id = %s
+                  AND se.status = 'ACTIVE'
+
+                ORDER BY
+                    c.class_order,
+                    s.student_name,
+                    r.generated_date DESC
+            """, (
+                teacher_id,
+                academic_year_id
+            ))
+
+            recommendations = cur.fetchall()
+
+    finally:
+        conn.close()
+
+    return render_template(
+        "teacher_recommendation_records.html",
+        teacher_name=teacher_name,
+        academic_year_name=academic_year_name,
+        recommendations=recommendations
+    )

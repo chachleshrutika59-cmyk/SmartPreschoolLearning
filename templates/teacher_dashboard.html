@@ -107,9 +107,7 @@
             </li>
 
 
-            <!-- ======================================
-                 ATTENDANCE - MARK ATTENDANCE
-            ======================================= -->
+            <!-- ATTENDANCE -->
 
             <li>
 
@@ -140,8 +138,10 @@
             <li>
 
                 <a href="{{ url_for('teacher.teacher_progress') }}">
-    📊 Student Progress
-</a>
+
+                    📊 Student Progress
+
+                </a>
 
             </li>
 
@@ -150,7 +150,7 @@
 
             <li>
 
-                <a href="#">
+                <a href="{{ url_for('teacher.teacher_recommendations') }}">
 
                     💡 Recommendations
 
@@ -201,7 +201,6 @@
 
                 </h1>
 
-
                 <p>
 
                     Manage your students and track their
@@ -212,18 +211,15 @@
             </div>
 
 
-
             <!-- TEACHER PROFILE -->
 
             <div class="admin-profile">
-
 
                 <div class="profile-avatar">
 
                     👩‍🏫
 
                 </div>
-
 
                 <div>
 
@@ -233,7 +229,6 @@
 
                     </strong>
 
-
                     <small>
 
                         Teacher
@@ -241,7 +236,6 @@
                     </small>
 
                 </div>
-
 
             </div>
 
@@ -257,16 +251,21 @@
         <div class="content-card"
              style="margin-bottom: 25px;">
 
+
             <div class="section-heading">
 
                 <div>
 
                     <h2>
+
                         👩‍🏫 Teacher Information
+
                     </h2>
 
                     <p>
+
                         Your registered teacher account details
+
                     </p>
 
                 </div>
@@ -289,11 +288,15 @@
                 ">
 
                     <small style="color:#64748b;">
+
                         Teacher Name
+
                     </small>
 
                     <h3 style="margin: 6px 0 0;">
+
                         {{ teacher_name }}
+
                     </h3>
 
                 </div>
@@ -306,7 +309,9 @@
                 ">
 
                     <small style="color:#64748b;">
+
                         Email
+
                     </small>
 
                     <h3 style="
@@ -328,7 +333,9 @@
                 ">
 
                     <small style="color:#64748b;">
+
                         Mobile
+
                     </small>
 
                     <h3 style="margin: 6px 0 0;">
@@ -358,23 +365,30 @@
             <div class="stat-card blue">
 
                 <div class="stat-icon">
+
                     👧
+
                 </div>
 
                 <h3>
+
                     My Students
+
                 </h3>
 
                 <div class="number">
+
                     {{ student_count }}
+
                 </div>
 
                 <p>
+
                     Assigned students
+
                 </p>
 
             </div>
-
 
 
             <!-- ACTIVITIES -->
@@ -382,23 +396,30 @@
             <div class="stat-card pink">
 
                 <div class="stat-icon">
+
                     📚
+
                 </div>
 
                 <h3>
+
                     Activities
+
                 </h3>
 
                 <div class="number">
+
                     {{ activity_count }}
+
                 </div>
 
                 <p>
+
                     Learning records
+
                 </p>
 
             </div>
-
 
 
             <!-- ATTENDANCE -->
@@ -406,23 +427,30 @@
             <div class="stat-card yellow">
 
                 <div class="stat-icon">
+
                     📅
+
                 </div>
 
                 <h3>
+
                     Attendance
+
                 </h3>
 
                 <div class="number">
+
                     {{ attendance_count }}
+
                 </div>
 
                 <p>
+
                     Records this month
+
                 </p>
 
             </div>
-
 
 
             <!-- ASSESSMENTS -->
@@ -430,19 +458,27 @@
             <div class="stat-card green">
 
                 <div class="stat-icon">
+
                     📊
+
                 </div>
 
                 <h3>
+
                     Assessments
+
                 </h3>
 
                 <div class="number">
+
                     {{ assessment_count }}
+
                 </div>
 
                 <p>
+
                     Assessment records
+
                 </p>
 
             </div>
@@ -462,22 +498,23 @@
 
             <div class="section-heading">
 
-
                 <div>
 
                     <h2>
+
                         🏫 My Assigned Classes
+
                     </h2>
 
                     <p>
+
                         Classes assigned to you for the academic year
+
                     </p>
 
                 </div>
 
-
             </div>
-
 
 
             {% if assigned_classes %}
@@ -542,8 +579,11 @@
                     ">
 
                         📅 Academic Year:
+
                         <strong>
+
                             {{ class_item[3] }}
+
                         </strong>
 
                     </p>
@@ -563,7 +603,9 @@
 
 
                         <span style="color:#64748b;">
+
                             👧 Students
+
                         </span>
 
 
@@ -668,11 +710,15 @@
                 <div>
 
                     <h2>
+
                         🚀 Quick Actions
+
                     </h2>
 
                     <p>
+
                         Manage your classroom activities
+
                     </p>
 
                 </div>
@@ -690,21 +736,23 @@
                 <a href="{{ url_for('teacher.teacher_students') }}"
                    class="action-card action-blue">
 
-
                     <div class="action-icon">
+
                         👧
+
                     </div>
 
-
                     <h3>
+
                         My Students
+
                     </h3>
 
-
                     <p>
-                        View assigned students
-                    </p>
 
+                        View assigned students
+
+                    </p>
 
                 </a>
 
@@ -715,48 +763,50 @@
                 <a href="{{ url_for('teacher.add_learning_activity') }}"
                    class="action-card action-pink">
 
-
                     <div class="action-icon">
+
                         📚
+
                     </div>
 
-
                     <h3>
+
                         Add Activity
+
                     </h3>
 
-
                     <p>
-                        Record student learning
-                    </p>
 
+                        Record student learning
+
+                    </p>
 
                 </a>
 
 
 
-                <!-- ======================================
-                     ATTENDANCE RECORDS
-                ======================================= -->
+                <!-- ATTENDANCE RECORDS -->
 
                 <a href="{{ url_for('teacher.attendance_records') }}"
-   class="action-card action-yellow">
-
+                   class="action-card action-yellow">
 
                     <div class="action-icon">
+
                         📊
+
                     </div>
 
-
                     <h3>
+
                         Attendance
+
                     </h3>
 
-
                     <p>
-                        View attendance records
-                    </p>
 
+                        View attendance records
+
+                    </p>
 
                 </a>
 
@@ -765,23 +815,54 @@
                 <!-- VIEW PROGRESS -->
 
                 <a href="{{ url_for('teacher.teacher_progress') }}"
-   class="action-card action-green">
-
+                   class="action-card action-green">
 
                     <div class="action-icon">
+
                         📊
+
                     </div>
 
-
                     <h3>
+
                         View Progress
+
                     </h3>
 
-
                     <p>
+
                         Analyze student progress
+
                     </p>
 
+                </a>
+
+
+
+                <!-- ======================================
+                     VIEW RECOMMENDATION RECORDS
+                ======================================= -->
+
+                <a href="{{ url_for('teacher.teacher_recommendation_records') }}"
+                   class="action-card action-purple">
+
+                    <div class="action-icon">
+
+                        💡
+
+                    </div>
+
+                    <h3>
+
+                        Recommendations
+
+                    </h3>
+
+                    <p>
+
+                        View saved student recommendations
+
+                    </p>
 
                 </a>
 
@@ -808,7 +889,6 @@
             </h2>
 
 
-
             <div class="system-message">
 
 
@@ -820,7 +900,6 @@
 
 
                 <div>
-
 
                     <h3>
 
@@ -834,7 +913,9 @@
                         You currently have
 
                         <strong>
+
                             {{ student_count }}
+
                         </strong>
 
                         assigned student(s).
@@ -844,7 +925,6 @@
                         dashboard.
 
                     </p>
-
 
                 </div>
 

@@ -275,14 +275,13 @@ body {
     background: #f7fbff;
 }
 
-
 /* ========================================
    SIDEBAR
 ======================================== */
 
 .sidebar {
     width: 255px;
-    min-height: 100vh;
+    height: 100vh;
 
     background: white;
 
@@ -297,6 +296,13 @@ body {
     box-shadow: 5px 0 20px rgba(70, 100, 140, 0.06);
 
     z-index: 10;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
 }
 
 
@@ -340,6 +346,14 @@ body {
     list-style: none;
 
     padding: 0;
+    margin: 0;
+
+    flex: 1;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding-bottom: 20px;
 }
 
 
@@ -394,13 +408,13 @@ body {
 ======================================== */
 
 .sidebar-logout {
-    position: absolute;
+    position: static;
 
-    bottom: 25px;
+    flex-shrink: 0;
 
-    left: 15px;
+    margin-top: 10px;
 
-    right: 15px;
+    padding-top: 10px;
 }
 
 
@@ -430,7 +444,6 @@ body {
 
     transform: translateY(-2px);
 }
-
 
 /* ========================================
    MAIN CONTENT

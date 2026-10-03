@@ -1,0 +1,309 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Recommendation Records - Smart Preschool</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        .records-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .recommendation-card {
+            background: white;
+            border-radius: 15px;
+            padding: 22px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 5px solid #6c63ff;
+        }
+
+        .student-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .admission-number {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            margin-bottom: 10px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .learning-area {
+            display: inline-block;
+            background: #eeeaff;
+            color: #5b50c8;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .recommendation-text {
+            margin-top: 18px;
+            padding: 15px;
+            background: #f8f8ff;
+            border-radius: 10px;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .generated-date {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #777;
+        }
+
+        .empty-state {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .empty-state h2 {
+            margin-bottom: 10px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="dashboard-container">
+
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>Smart Preschool</h2>
+            <p>Learning Analytics</p>
+        </div>
+
+
+        <nav>
+
+            <a href="{{ url_for('teacher_dashboard') }}">
+                🏠 Dashboard
+            </a>
+
+            <a href="{{ url_for('teacher.teacher_students') }}">
+                👨‍🎓 My Students
+            </a>
+
+            <a href="{{ url_for('teacher.add_learning_activity') }}">
+                📚 Learning Activities
+            </a>
+
+            <a href="{{ url_for('teacher.teacher_assessments') }}">
+                📝 Assessments
+            </a>
+
+            <a href="{{ url_for('teacher.teacher_attendance') }}">
+                📅 Attendance
+            </a>
+
+            <a href="#">
+                🗒️ Teacher Remarks
+            </a>
+
+            <a href="{{ url_for('teacher.teacher_progress') }}">
+                📊 Student Progress
+            </a>
+
+            <a href="{{ url_for('teacher.teacher_recommendations') }}">
+                💡 Recommendations
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}">
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <main class="main-content">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="page-header">
+
+            <h1>
+                💡 Recommendation Records
+            </h1>
+
+            <p>
+                View personalized learning recommendations
+                given to students.
+            </p>
+
+            <p>
+                <strong>Teacher:</strong>
+                {{ teacher_name }}
+                &nbsp;&nbsp; | &nbsp;&nbsp;
+
+                <strong>Academic Year:</strong>
+                {{ academic_year_name }}
+            </p>
+
+        </div>
+
+
+
+        <!-- ================= RECORDS ================= -->
+
+        {% if recommendations %}
+
+        <div class="records-container">
+
+            {% for item in recommendations %}
+
+            <div class="recommendation-card">
+
+
+                <!-- STUDENT -->
+
+                <div class="student-name">
+                    {{ item[1] }}
+                </div>
+
+                <div class="admission-number">
+                    Admission No: {{ item[2] }}
+                </div>
+
+
+                <!-- CLASS -->
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Class:
+                    </span>
+
+                    {{ item[3] }}
+
+                </div>
+
+
+                <!-- LEARNING AREA -->
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Learning Area:
+                    </span>
+
+                    <br>
+
+                    <span class="learning-area">
+                        {{ item[4] }}
+                    </span>
+
+                </div>
+
+
+                <!-- RECOMMENDATION -->
+
+                <div class="recommendation-text">
+
+                    <strong>
+                        Teacher Recommendation:
+                    </strong>
+
+                    <br><br>
+
+                    {{ item[5] }}
+
+                </div>
+
+
+                <!-- GENERATED DATE -->
+
+                <div class="generated-date">
+
+                    Generated on:
+                    {{ item[6] }}
+
+                </div>
+
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% else %}
+
+        <!-- EMPTY STATE -->
+
+        <div class="empty-state">
+
+            <h2>
+                📭 No Recommendations Available
+            </h2>
+
+            <p>
+                No personalized recommendations have
+                been generated for your students yet.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>
