@@ -3057,12 +3057,14 @@ def teacher_recommendations():
         recommendations=recommendations
     )
 
+
+
     # =========================================================
-# TEACHER - VIEW SAVED RECOMMENDATION RECORDS
+# TEACHER - TEACHER REMARKS
 # =========================================================
 
-@teacher.route("/teacher/recommendations/records")
-def teacher_recommendation_records():
+@teacher.route("/teacher/remarks", methods=["GET", "POST"])
+def teacher_remarks():
 
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
@@ -3078,7 +3080,10 @@ def teacher_recommendation_records():
 
         with conn.cursor() as cur:
 
-            # Get teacher
+            # =================================================
+            # GET TEACHER
+            # =================================================
+
             cur.execute("""
                 SELECT id, teacher_name
                 FROM teachers
@@ -3093,7 +3098,11 @@ def teacher_recommendation_records():
             teacher_id = teacher_data[0]
             teacher_name = teacher_data[1]
 
-            # Get current academic year
+
+            # =================================================
+            # CURRENT ACADEMIC YEAR
+            # =================================================
+
             cur.execute("""
                 SELECT id, year_name
                 FROM academic_years
@@ -3109,53 +3118,503 @@ def teacher_recommendation_records():
             academic_year_id = current_year[0]
             academic_year_name = current_year[1]
 
-            # Get recommendations for students
-            # belonging to classes assigned to this teacher
+
+            # =================================================
+            # ASSIGNED CLASSES
+            # =================================================
+
             cur.execute("""
                 SELECT
-                    r.id,
-                    s.student_name,
-                    s.admission_number,
+                    c.id,
                     c.class_name,
-                    r.learning_area,
-                    r.recommendation,
-                    r.generated_date
-                FROM recommendations r
-
-                JOIN students s
-                    ON r.student_id = s.id
-
-                JOIN student_enrollments se
-                    ON r.enrollment_id = se.id
-
+                    c.class_order
+                FROM class_teacher_assignments cta
                 JOIN classes c
-                    ON se.class_id = c.id
-
-                JOIN class_teacher_assignments cta
-                    ON cta.class_id = se.class_id
-                   AND cta.academic_year_id = se.academic_year_id
-
+                    ON cta.class_id = c.id
                 WHERE cta.teacher_id = %s
-                  AND se.academic_year_id = %s
-                  AND se.status = 'ACTIVE'
-
-                ORDER BY
-                    c.class_order,
-                    s.student_name,
-                    r.generated_date DESC
+                  AND cta.academic_year_id = %s
+                ORDER BY c.class_order
             """, (
                 teacher_id,
                 academic_year_id
             ))
 
-            recommendations = cur.fetchall()
+            assigned_classes = cur.fetchall()
+
+
+            # =================================================
+            # SELECTED CLASS
+            # =================================================
+
+            selected_class_id = request.args.get(
+                "class_id",
+                type=int
+            )
+
+            if not selected_class_id and assigned_classes:
+                selected_class_id = assigned_classes[0][0]
+
+
+            # =================================================
+            # EDIT REMARK ID FROM URL
+            # =================================================
+
+            edit_remark_id = request.args.get(
+                "edit_id",
+                type=int
+            )
+
+            edit_remark = None
+
+
+            # =================================================
+            # POST REQUEST
+            # =================================================
+
+            if request.method == "POST":
+
+                action = request.form.get(
+                    "action",
+                    "add"
+                ).strip().lower()
+
+
+                # =================================================
+                # DELETE
+                # =================================================
+
+                if action == "delete":
+
+                    remark_id = request.form.get(
+                        "remark_id",
+                        type=int
+                    )
+
+                    class_id = request.form.get(
+                        "class_id",
+                        type=int
+                    )
+
+                    if not remark_id or not class_id:
+                        return (
+                            "Remark ID and class are required.",
+                            400
+                        )
+
+
+                    # Verify permission
+                    cur.execute("""
+                        SELECT tr.id
+                        FROM teacher_remarks tr
+                        JOIN student_enrollments se
+                            ON tr.enrollment_id = se.id
+                        JOIN class_teacher_assignments cta
+                            ON cta.class_id = se.class_id
+                           AND cta.academic_year_id =
+                               se.academic_year_id
+                        WHERE tr.id = %s
+                          AND tr.teacher_id = %s
+                          AND se.class_id = %s
+                          AND se.academic_year_id = %s
+                          AND se.status = 'ACTIVE'
+                          AND cta.teacher_id = %s
+                        LIMIT 1
+                    """, (
+                        remark_id,
+                        teacher_id,
+                        class_id,
+                        academic_year_id,
+                        teacher_id
+                    ))
+
+                    remark_exists = cur.fetchone()
+
+                    if not remark_exists:
+                        return (
+                            "You are not authorized to delete this remark.",
+                            403
+                        )
+
+
+                    # Delete
+                    cur.execute("""
+                        DELETE FROM teacher_remarks
+                        WHERE id = %s
+                          AND teacher_id = %s
+                    """, (
+                        remark_id,
+                        teacher_id
+                    ))
+
+                    conn.commit()
+
+
+                    return redirect(
+                        url_for(
+                            "teacher.teacher_remarks",
+                            class_id=class_id
+                        )
+                    )
+
+
+                # =================================================
+                # EDIT / UPDATE
+                # =================================================
+
+                elif action == "edit":
+
+                    remark_id = request.form.get(
+                        "remark_id",
+                        type=int
+                    )
+
+                    class_id = request.form.get(
+                        "class_id",
+                        type=int
+                    )
+
+                    student_id = request.form.get(
+                        "student_id",
+                        type=int
+                    )
+
+                    updated_remark = request.form.get(
+                        "remark",
+                        ""
+                    ).strip()
+
+
+                    if not remark_id:
+                        return "Remark ID is required.", 400
+
+                    if not class_id:
+                        return "Class is required.", 400
+
+                    if not student_id:
+                        return "Student is required.", 400
+
+                    if not updated_remark:
+                        return "Remark cannot be empty.", 400
+
+
+                    # Verify remark
+                    cur.execute("""
+                        SELECT tr.id
+                        FROM teacher_remarks tr
+                        JOIN student_enrollments se
+                            ON tr.enrollment_id = se.id
+                        JOIN class_teacher_assignments cta
+                            ON cta.class_id = se.class_id
+                           AND cta.academic_year_id =
+                               se.academic_year_id
+                        WHERE tr.id = %s
+                          AND tr.teacher_id = %s
+                          AND tr.student_id = %s
+                          AND se.class_id = %s
+                          AND se.academic_year_id = %s
+                          AND se.status = 'ACTIVE'
+                          AND cta.teacher_id = %s
+                        LIMIT 1
+                    """, (
+                        remark_id,
+                        teacher_id,
+                        student_id,
+                        class_id,
+                        academic_year_id,
+                        teacher_id
+                    ))
+
+                    remark_exists = cur.fetchone()
+
+                    if not remark_exists:
+                        return (
+                            "You are not authorized to edit this remark.",
+                            403
+                        )
+
+
+                    # Update remark
+                    cur.execute("""
+                        UPDATE teacher_remarks
+                        SET remark = %s
+                        WHERE id = %s
+                          AND teacher_id = %s
+                    """, (
+                        updated_remark,
+                        remark_id,
+                        teacher_id
+                    ))
+
+                    conn.commit()
+
+
+                    return redirect(
+                        url_for(
+                            "teacher.teacher_remarks",
+                            class_id=class_id
+                        )
+                    )
+
+
+                # =================================================
+                # ADD NEW REMARK
+                # =================================================
+
+                elif action == "add":
+
+                    student_id = request.form.get(
+                        "student_id",
+                        type=int
+                    )
+
+                    class_id = request.form.get(
+                        "class_id",
+                        type=int
+                    )
+
+                    remark = request.form.get(
+                        "remark",
+                        ""
+                    ).strip()
+
+
+                    if not student_id or not class_id or not remark:
+                        return (
+                            "Student, class and remark are required.",
+                            400
+                        )
+
+
+                    # Verify student
+                    cur.execute("""
+                        SELECT se.id
+                        FROM student_enrollments se
+                        JOIN class_teacher_assignments cta
+                            ON cta.class_id = se.class_id
+                           AND cta.academic_year_id =
+                               se.academic_year_id
+                        WHERE se.student_id = %s
+                          AND se.class_id = %s
+                          AND se.academic_year_id = %s
+                          AND se.status = 'ACTIVE'
+                          AND cta.teacher_id = %s
+                        LIMIT 1
+                    """, (
+                        student_id,
+                        class_id,
+                        academic_year_id,
+                        teacher_id
+                    ))
+
+                    enrollment = cur.fetchone()
+
+                    if not enrollment:
+                        return (
+                            "You are not authorized to add "
+                            "a remark for this student.",
+                            403
+                        )
+
+
+                    enrollment_id = enrollment[0]
+
+
+                    # Insert
+                    cur.execute("""
+                        INSERT INTO teacher_remarks
+                        (
+                            student_id,
+                            enrollment_id,
+                            teacher_id,
+                            remark_date,
+                            remark
+                        )
+                        VALUES
+                        (
+                            %s,
+                            %s,
+                            %s,
+                            CURRENT_DATE,
+                            %s
+                        )
+                    """, (
+                        student_id,
+                        enrollment_id,
+                        teacher_id,
+                        remark
+                    ))
+
+                    conn.commit()
+
+
+                    return redirect(
+                        url_for(
+                            "teacher.teacher_remarks",
+                            class_id=class_id
+                        )
+                    )
+
+
+                else:
+
+                    return "Invalid action.", 400
+
+
+            # =================================================
+            # GET STUDENTS
+            # =================================================
+
+            students = []
+
+            if selected_class_id:
+
+                cur.execute("""
+                    SELECT id
+                    FROM class_teacher_assignments
+                    WHERE teacher_id = %s
+                      AND class_id = %s
+                      AND academic_year_id = %s
+                """, (
+                    teacher_id,
+                    selected_class_id,
+                    academic_year_id
+                ))
+
+                class_assignment = cur.fetchone()
+
+                if not class_assignment:
+                    return (
+                        "You are not assigned to this class.",
+                        403
+                    )
+
+
+                cur.execute("""
+                    SELECT
+                        s.id,
+                        s.student_name,
+                        s.admission_number
+                    FROM students s
+                    JOIN student_enrollments se
+                        ON s.id = se.student_id
+                    WHERE se.class_id = %s
+                      AND se.academic_year_id = %s
+                      AND se.status = 'ACTIVE'
+                    ORDER BY s.student_name
+                """, (
+                    selected_class_id,
+                    academic_year_id
+                ))
+
+                students = cur.fetchall()
+
+
+            # =================================================
+            # GET REMARK TO EDIT
+            # =================================================
+
+            if edit_remark_id:
+
+                cur.execute("""
+                    SELECT
+                        tr.id,
+                        tr.student_id,
+                        tr.remark,
+                        tr.remark_date,
+                        se.class_id
+                    FROM teacher_remarks tr
+                    JOIN student_enrollments se
+                        ON tr.enrollment_id = se.id
+                    JOIN class_teacher_assignments cta
+                        ON cta.class_id = se.class_id
+                       AND cta.academic_year_id =
+                           se.academic_year_id
+                    WHERE tr.id = %s
+                      AND tr.teacher_id = %s
+                      AND se.academic_year_id = %s
+                      AND se.status = 'ACTIVE'
+                      AND cta.teacher_id = %s
+                    LIMIT 1
+                """, (
+                    edit_remark_id,
+                    teacher_id,
+                    academic_year_id,
+                    teacher_id
+                ))
+
+                edit_remark = cur.fetchone()
+
+                if not edit_remark:
+                    return "Remark not found or access denied.", 404
+
+                # Make sure class matches the remark
+                selected_class_id = edit_remark[4]
+
+
+            # =================================================
+            # PREVIOUS REMARKS
+            # =================================================
+
+            remarks = []
+
+            if selected_class_id:
+
+                cur.execute("""
+                    SELECT
+                        tr.id,
+                        s.student_name,
+                        s.admission_number,
+                        tr.remark,
+                        tr.remark_date
+                    FROM teacher_remarks tr
+                    JOIN students s
+                        ON tr.student_id = s.id
+                    JOIN student_enrollments se
+                        ON tr.enrollment_id = se.id
+                    JOIN class_teacher_assignments cta
+                        ON cta.class_id = se.class_id
+                       AND cta.academic_year_id =
+                           se.academic_year_id
+                    WHERE tr.teacher_id = %s
+                      AND se.class_id = %s
+                      AND se.academic_year_id = %s
+                      AND se.status = 'ACTIVE'
+                      AND cta.teacher_id = %s
+                    ORDER BY
+                        tr.remark_date DESC,
+                        tr.id DESC
+                """, (
+                    teacher_id,
+                    selected_class_id,
+                    academic_year_id,
+                    teacher_id
+                ))
+
+                remarks = cur.fetchall()
+
+
+    except Exception as e:
+
+        conn.rollback()
+
+        return (
+            f"Error loading teacher remarks: {e}",
+            500
+        )
+
 
     finally:
+
         conn.close()
 
+
     return render_template(
-        "teacher_recommendation_records.html",
+        "teacher_remarks.html",
         teacher_name=teacher_name,
         academic_year_name=academic_year_name,
-        recommendations=recommendations
+        assigned_classes=assigned_classes,
+        selected_class_id=selected_class_id,
+        students=students,
+        remarks=remarks,
+        edit_remark=edit_remark
     )
